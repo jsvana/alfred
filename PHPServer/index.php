@@ -30,7 +30,7 @@
 			}
 			break;
 		case "Password.Retrieve":
-			if($data->{'key'} !== $_SESSION['key']) {
+			if($data->{'key'} === "" || $data->{'key'} !== $_SESSION['key']) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'master'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
