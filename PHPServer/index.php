@@ -43,7 +43,7 @@
 				} else {
 					$row = mysql_fetch_assoc($result);
 					$pass = decrypt($row['password'], $data->{'params'}->{'master'});
-					$ret = "{\"result\":{\"password\":\"" . $pass . "\"}}";
+					$ret = "{\"result\":{\"password\":\"" . $pass . "\",\"master\":\"" . $data->{'params'}->{'master'} . "\"}}";
 				}
 			}
 			break;
