@@ -2,6 +2,11 @@
 	session_start();
 
 	$data = json_decode($_POST['json']);
+
+	if(!isset($data->{'method'})) {
+		echo "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
+		return;
+	}
 	
 	$method = $data->{'method'};
 
@@ -43,7 +48,7 @@
 			}
 			break;
 		default:
-			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command\",\"data\":{}}}";
+			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
 			break;
 	}
 
