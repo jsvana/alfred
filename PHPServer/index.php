@@ -3,8 +3,8 @@
 
 	$data = json_decode($_POST['json']);
 
-	if(!isset($data->{'method'})) {
-		echo "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
+	if(!isset($data) || !isset($data->{'method'})) {
+		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}}";
 		return;
 	}
 	
