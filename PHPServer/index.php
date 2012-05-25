@@ -14,9 +14,9 @@
 			$password = $data->{'params'}->{'password'};
 
 			if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
-				$ret = "{\"key\":\"" . md5($username . $password . date()) . "\"}";
+				$ret = "{\"result\":{\"key\":\"" . md5($username . $password . date()) . "\"}}";
 			} else {
-				$ret = "{\"error\":\"Incorrect username or password.\"}";
+				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\",\"data\":{}}}";
 			}
 			break;
 		default:
