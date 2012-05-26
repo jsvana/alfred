@@ -185,6 +185,33 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":" . json_encode($resultJSON->{'result'}) . "}}";
 			}
 			break;
+		case "Weather.Current":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else if(!isset($data->{'params'}->{'zip'})) {
+				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
+			} else {
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, "http://xml.weather.yahoo.com/forecastrss?p=" . $data->{'params'}->{'zip'});
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+				$result = curl_exec($ch);
+				
+				$xml = new SimpleXMLElement($result);
+
+				curl_close($ch);
+
+				if($xml->rss->channel->title === "Yahoo! Weather - Error") {
+					$ret = "{\"error\":{\"code\":-5,\"message\":\"Unable to find weather for zip '" . $data->{'params'}->{'zip'} . ".\"}}";
+				} else {
+					$item = $xml->rss->channel->item;
+
+					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"title\":\"" . $item->title . "\",\"text\":\"" . $item->{'yweather:condition'}->attributes('text') . "\",\"temp\":\"" . $item->{'yweather:condition'}->attributes('temp') . "\"}}}";
+				}
+			}
+			break;
 		default:
 			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
 			break;
