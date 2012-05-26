@@ -1,27 +1,25 @@
 <?php
 	session_start();
 
+	include("config.php");
+
 	$data = json_decode($_POST['json']);
 
 	if(!isset($data) || !isset($data->{'method'})) {
-		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}}";
+		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\"}}";
 		return;
 	}
 
 	$method = $data->{'method'};
 
-	mysql_connect("localhost", "alfred", "my_cocaine");
-	mysql_select_db("alfred");
-
-	$XBMC_USERNAME = "xbmc";
-	$XBMC_PASSWORD = "1123581321!";
-	$XBMC_HOST = "67.149.240.147";
-	$XBMC_PORT = "8080";
+	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
+	mysql_select_db($MYSQL_DATABASE);
 
 	$ret = "";
 
 	switch($method) {
-		case "App.Login":
+		/* Alfred */
+		case "Alfred.Login":
 			$username = $data->{'params'}->{'username'};
 			$password = $data->{'params'}->{'password'};
 
@@ -34,6 +32,12 @@
 				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
 			}
 			break;
+		case "Alfred.Time":
+			$ret = "{\"result\":{\"message\":\"Time retrieved.\",\"data\":\"" . date("Y-m-d H:i:s \G\M\TP") . "\"}}";
+
+			break;
+
+		/* Password */
 		case "Password.Retrieve":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
@@ -71,20 +75,13 @@
 				}
 			}
 			break;
+
+		/* XBMC */
 		case "XBMC.Pause":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$result = curl_exec($ch);
-
-				curl_close($ch);
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
 
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
@@ -94,16 +91,7 @@
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": { \"mute\": " . ($method === "XBMC.Mute" ? "true" : "false") . " }, \"id\": 1}");
-
-				$result = curl_exec($ch);
-
-				curl_close($ch);
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": { \"mute\": " . ($method === "XBMC.Mute" ? "true" : "false") . " }, \"id\": 1}");
 
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
@@ -113,16 +101,7 @@
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Go" . ($method === "XBMC.Next" ? "Next" : "Previous") . "\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$result = curl_exec($ch);
-
-				curl_close($ch);
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Go" . ($method === "XBMC.Next" ? "Next" : "Previous") . "\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
 
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
@@ -133,16 +112,7 @@
 			} else if(!isset($data->{'params'}->{'volume'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'volume' not set.\"}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " . $data->{'params'}->{'volume'} . " }, \"id\": 1}");
-
-				$result = curl_exec($ch);
-
-				curl_close($ch);
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " . $data->{'params'}->{'volume'} . " }, \"id\": 1}");
 
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
@@ -151,16 +121,7 @@
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.Shuffle\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$result = curl_exec($ch);
-
-				curl_close($ch);
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Shuffle\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
 
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
@@ -169,14 +130,7 @@
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else {
-				$ch = curl_init();
-
-				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
-
-				$result = curl_exec($ch);
+				$result = xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
 				
 				$resultJSON = json_decode($result);
 
@@ -185,7 +139,9 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":" . json_encode($resultJSON->{'result'}) . "}}";
 			}
 			break;
-		case "Weather.Current":
+
+		/* Location */
+		case "Location.Weather":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'zip'})) {
@@ -215,6 +171,8 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
 			}
 			break;
+
+		/* Network */
 		case "Network.Ping":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
@@ -232,6 +190,17 @@
 	}
 
 	echo $ret;
+
+	function xbmc_request($data) {
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+		return curl_exec($ch);
+	}
 
 	function encrypt($val, $key) {
 		return trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $val, MCRYPT_MODE_ECB, mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND))));
