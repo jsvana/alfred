@@ -246,7 +246,7 @@
 			$message .= join("', '", array_keys($empty)) . "' cannot be empty";
 		}
 
-		if(count($message) !== 0) {
+		if($message !== "") {
 			$message .= ".";
 		}
 
