@@ -315,6 +315,11 @@
 	}
 
 	function xbmc_request($data) {
+		global $XBMC_USERNAME;
+		global $XBMC_PASSWORD;
+		global $XBMC_HOST;
+		global $XBMC_PORT;
+		
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
