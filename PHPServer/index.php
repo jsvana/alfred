@@ -22,7 +22,7 @@
 
 			if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
 				$key = md5($username . $password . date());
-				$_SESSION['key'] = $key;
+				mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
 
 				$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
 			} else {
@@ -30,7 +30,9 @@
 			}
 			break;
 		case "Password.Retrieve":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || $data->{'key'} !== $_SESSION['key']) {
+			$result = mysql_query("UPDATE `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->{'key'}) . "' AND `expiration`>NOW() SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR));");
+
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || mysql_affected_rows($result) === 0) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'master'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
