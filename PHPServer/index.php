@@ -30,8 +30,7 @@
 			}
 			break;
 		case "Password.Retrieve":
-			$result = mysql_query("UPDATE `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->{'key'}) . "' AND `expiration`>NOW() SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR));");
-
+			$result = mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($data->{'key'}) . "' AND `expiration`>NOW();");
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || mysql_affected_rows($result) === 0) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'master'})) {
