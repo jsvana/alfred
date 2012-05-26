@@ -1,4 +1,4 @@
-PROG = alfred
+PROG = alfred.rpc
 OBJS = main.o json.o error.o
 MODULES = alfred.o location.o network.o password.o xbmc.o
 LIBS = json glib-2.0
