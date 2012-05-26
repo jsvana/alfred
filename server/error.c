@@ -5,13 +5,13 @@
 #include "json.h"
 
 static char *alfred_error_text[ALFRED_ERROR_COUNT] = {
-	"Ok",
-	"Malformed command",
-	"Unknown command",
-	"Not authenticated",
-	"Incorrect parameters",
-	"Method failed",
-	"Internal server error"
+	"Ok.",
+	"Malformed command.",
+	"Unknown command.",
+	"Not authenticated.",
+	"Incorrect parameters.",
+	"Method failed.",
+	"Internal server error."
 };
 
 void alfred_error_static(alfred_error err) {

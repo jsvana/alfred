@@ -9,11 +9,15 @@
 #include "sql.h"
 #include "json.h"
 #include "error.h"
+#include "utils.h"
 
 void alfred_module_alfred(const char *command, json_object *params) {
 	if (strcmp(command, "Login") == 0) {
 		char *username = alfred_json_get_string(params, "username");
 		char *password = alfred_json_get_string(params, "password");
+		if (!username || !password) {
+			alfred_error_static(ALFRED_ERROR_INCORRECT_PARAMS);
+		}
 		char *escaped_username = alfred_sql_escape_string(username);
 		char *escaped_password = alfred_sql_escape_string(password);
 		g_free(username);
@@ -31,9 +35,7 @@ void alfred_module_alfred(const char *command, json_object *params) {
 
 		if (num == 1) {
 			char *key = g_strdup_printf("%s%s%zd", escaped_username, escaped_password, time(NULL));
-			GChecksum *hasher = g_checksum_new(G_CHECKSUM_MD5);
-			g_checksum_update(hasher, (unsigned char *)key, -1);
-			unsigned char *hash = g_checksum_get_string(hasher);
+			char *hash = alfred_utils_md5(key);
 
 			query = g_strconcat("INSERT INTO `sessions` (api_key, expiration) VALUES ('", hash, "', DATE_ADD(NOW(), INTERVAL 1 HOUR));", NULL);
 
@@ -46,7 +48,7 @@ void alfred_module_alfred(const char *command, json_object *params) {
 
 			alfred_json_create_display(0, "Method success", obj);
 
-			g_checksum_free(hasher);
+			g_free(hash);
 			g_free(key);
 			g_free(query);
 		} else {
