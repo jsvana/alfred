@@ -233,14 +233,14 @@
 		$message = "";
 
 		if(count($missing) !== 0) {
-			$message = "Missing parameters '" . join("', '", array_keys($missing)) . "'";
+			$message = "Missing parameter" . (count($missing) === 1 ? "" : "s") . " '" . join("', '", array_keys($missing)) . "'";
 		}
 
 		if(count($empty) !== 0) {
 			if(count($message) !== 0) {
-				$message .= ", and parameters '";
+				$message .= ", and parameter" . (count($empty) === 1 ? "" : "s") . " '";
 			} else {
-				$message = "Parameters '";
+				$message = "Parameter" . (count($empty) === 1 ? "" : "s") . " '";
 			}
 
 			$message .= join("', '", array_keys($empty)) . "' cannot be empty";
