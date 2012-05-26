@@ -194,7 +194,6 @@
 				$ch = curl_init();
 
 				curl_setopt($ch, CURLOPT_URL, "http://xml.weather.yahoo.com/forecastrss?p=" . $data->{'params'}->{'zip'});
-				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
 				$result = curl_exec($ch);
