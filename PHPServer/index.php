@@ -215,6 +215,17 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
 			}
 			break;
+		case "Network.Ping":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else if(!isset($data->{'params'}->{'host'})) {
+				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+			} else {
+				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
+
+				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"" . $output . "\"}}}";
+			}
+			break;
 		default:
 			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
 			break;
