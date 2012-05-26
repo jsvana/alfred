@@ -66,7 +66,7 @@ Gets the server time.
 
 **Parameters:** `none`
 
-**Returns:** `time (string)`
+**Returns:** `time (string, formatted YYYY-mm-dd hh:mm:ss GMT-hh:mm)`
 
 #### Location
 
