@@ -65,8 +65,8 @@ Initiates session with the server.
 Adds a password to the password manager.
 
 **Parameters:**  
-	`site`, the site for which the password is retrieved
-	`new`, the new password that is added
+	`site`, the site for which the password is retrieved  
+	`new`, the new password that is added  
 	`master`, the encryption key and identity verification
 
 **Returns:** nothing
@@ -76,7 +76,7 @@ Adds a password to the password manager.
 Retrieves a password from the password manager.
 
 **Parameters:**  
-	`site`, the site for which the password is retrieved
+	`site`, the site for which the password is retrieved  
 	`master`, the encryption key and identity verification
 
 **Returns:** `password (string)`
@@ -156,7 +156,7 @@ Fetches current weather for a given zip code.
 **Parameters:** `zip (string)`
 
 **Returns:**  
-	`location`, the city and state for the conditions
-	`text`, a description of the conditions
-	`temp`, the current temperature (in Celcius)
-	`date`, the date of the conditions
+	`location`, the city and state for the conditions  
+	`text`, a description of the conditions  
+	`temp`, the current temperature (in Celcius)  
+	`date`, the date of the conditions  
