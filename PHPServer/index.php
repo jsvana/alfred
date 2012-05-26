@@ -202,7 +202,7 @@
 
 				curl_close($ch);
 
-				$ret = alfred_result(0, array("message" => "Command sent.", "playerid" => json_encode($resultJSON->{'result'})));
+				$ret = alfred_result(0, array("message" => "Command sent.", "playerids" => json_encode($resultJSON->{'result'})));
 			}
 			break;
 
