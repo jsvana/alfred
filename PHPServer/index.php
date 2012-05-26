@@ -216,7 +216,7 @@
 
 	function validate_parameters($params, $valid) {
 		if(count($params) > count(valid)) {
-			return "Too many parameters."
+			return "Too many parameters.";
 		}
 
 		$missing = array();
