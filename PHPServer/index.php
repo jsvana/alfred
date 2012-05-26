@@ -213,14 +213,14 @@
 				}
 
 				var_dump($yw_forecast);
-
+				/*
 				if($xml->rss->channel->title === "Yahoo! Weather - Error") {
 					$ret = "{\"error\":{\"code\":-5,\"message\":\"Unable to find weather for zip '" . $data->{'params'}->{'zip'} . ".\"}}";
 				} else {
 					$item = $xml->rss->channel->item;
 
 					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"title\":\"" . $item->title . "\",\"text\":\"" . $item->{'condition'}->attributes('text') . "\",\"temp\":\"" . $item->{'yweather:condition'}->attributes('temp') . "\"}}}";
-				}
+				}*/
 			}
 			break;
 		default:
