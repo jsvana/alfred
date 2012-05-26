@@ -31,7 +31,7 @@
 
 				$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
 			} else {
-				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\",\"data\":{}}}";
+				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
 			}
 			break;
 		case "Password.Retrieve":
