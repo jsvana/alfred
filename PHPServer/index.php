@@ -108,6 +108,25 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
 			}
 			break;
+		case "XBMC.Next":
+		case "XBMC.Previous":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else {
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.Go" . ($method === "XBMC.Next" ? "Next" : "Previous") . "\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$result = curl_exec($ch);
+
+				curl_close($ch);
+
+				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
+			}
+			break;
 		default:
 			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
 			break;
