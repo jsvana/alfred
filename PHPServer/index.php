@@ -21,7 +21,7 @@
 			$password = $data->{'params'}->{'password'};
 
 			if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
-				$key = md5($username . $password . date());
+				$key = md5($username . $password . time());
 				mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
 
 				$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
@@ -30,8 +30,7 @@
 			}
 			break;
 		case "Password.Retrieve":
-			$result = mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($data->{'key'}) . "' AND `expiration`>NOW();");
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || mysql_affected_rows($result) === 0) {
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated()) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'master'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
@@ -49,7 +48,7 @@
 			}
 			break;
 		case "Password.Add":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || $data->{'key'} !== $_SESSION['key']) {
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated()) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'master'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
@@ -80,5 +79,10 @@
 
 	function decrypt($crypt, $key) {
 		return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($crypt), MCRYPT_MODE_ECB, mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND)));
+	}
+
+	function session_authenticated() {
+		$result = mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($data->{'key'}) . "' AND `expiration`>NOW();");
+		return mysql_affected_rows($result) > 0;
 	}
 ?>
