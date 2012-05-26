@@ -212,15 +212,7 @@
 					}
 				}
 
-				var_dump($yw_forecast);
-				/*
-				if($xml->rss->channel->title === "Yahoo! Weather - Error") {
-					$ret = "{\"error\":{\"code\":-5,\"message\":\"Unable to find weather for zip '" . $data->{'params'}->{'zip'} . ".\"}}";
-				} else {
-					$item = $xml->rss->channel->item;
-
-					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"title\":\"" . $item->title . "\",\"text\":\"" . $item->{'condition'}->attributes('text') . "\",\"temp\":\"" . $item->{'yweather:condition'}->attributes('temp') . "\"}}}";
-				}*/
+				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
 			}
 			break;
 		default:
