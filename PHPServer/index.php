@@ -5,12 +5,13 @@
 
 	$data = json_decode($_POST['json']);
 
-	if(!isset($data) || !isset($data->{'method'})) {
-		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\"}}";
+	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
+		echo "{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}";
 		return;
 	}
 
-	$method = $data->{'method'};
+	$method = $data->method;
+	$params = $data->params;
 
 	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
 	mysql_select_db($MYSQL_DATABASE);
@@ -20,16 +21,20 @@
 	switch($method) {
 		/* Alfred */
 		case "Alfred.Login":
-			$username = $data->{'params'}->{'username'};
-			$password = $data->{'params'}->{'password'};
-
-			if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
-				$key = md5($username . $password . time());
-				mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
-
-				$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
+			if(($message = validate_parameters($params, array("username", "password"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
-				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
+				$username = $data->params->username;
+				$password = $data->params->password;
+
+				if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
+					$key = md5($username . $password . time());
+					mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
+
+					$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
+				} else {
+					$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
+				}
 			}
 			break;
 		case "Alfred.Time":
@@ -41,8 +46,8 @@
 		case "Location.Weather":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'zip'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("zip"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
 				$weather = simplexml_load_string($weather_feed);
@@ -73,8 +78,8 @@
 		case "Network.Ping":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'host'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("host"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
 
@@ -84,8 +89,8 @@
 		case "Network.DNS":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'host'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("host"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				$output = shell_exec("dig " . $data->{'params'}->{'host'});
 
@@ -108,10 +113,8 @@
 		case "Password.Retrieve":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'master'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'site'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'site' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("master", "site"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
 				if(mysql_num_rows($result) === 0) {
@@ -126,12 +129,8 @@
 		case "Password.Add":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'master'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'site'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'site' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'new'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'new' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("master", "site", "new"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
 				if(mysql_num_rows($result) === 0) {
@@ -176,8 +175,8 @@
 		case "XBMC.Volume":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'volume'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'volume' not set.\"}}}";
+			} else if(($message = validate_parameters($params, array("volume"))) !== "") {
+				$ret = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{\"message\":\"" . $message . "\"}}";
 			} else {
 				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " . $data->{'params'}->{'volume'} . " }, \"id\": 1}");
 
@@ -214,6 +213,45 @@
 	}
 
 	echo $ret;
+
+	function validate_parameters($params, $valid) {
+		if(count($params) > count(valid)) {
+			return "Too many parameters."
+		}
+
+		$missing = array();
+		$empty = array();
+
+		foreach($valid as $key) {
+			if(!isset($params->{$key})) {
+				$missing[$key] = true;
+			} else if($params->{$key} === "") {
+				$empty[$key] = true;
+			}
+		}
+
+		$message = "";
+
+		if(count($missing) !== 0) {
+			$message = "Missing parameters '" . join("', '", array_keys($missing)) . "'";
+		}
+
+		if(count($empty) !== 0) {
+			if(count($message) !== 0) {
+				$message .= ", and parameters '";
+			} else {
+				$message = "Parameters '";
+			}
+
+			$message .= join("', '", array_keys($empty)) . "' cannot be empty";
+		}
+
+		if(count($message) !== 0) {
+			$message .= ".";
+		}
+
+		return $message;
+	}
 
 	function xbmc_request($data) {
 		$ch = curl_init();

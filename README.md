@@ -1,4 +1,4 @@
-#Alfred
+# Alfred
 
 ## Syntax
 
