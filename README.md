@@ -52,144 +52,170 @@ if there was an error.
 
 ### Alfred
 
-*Alfred.Login*
+**Alfred.Login**
 
 Initiates session with the server.
 
-**Parameters:**  
+*Parameters:*  
 	`username`, the username for the user  
 	`password`, the password for the user
 
-**Returns:** `key (string)`
+*Returns:* `key (string)`
 
-*Alfred.Time*
+**Alfred.Time**
 
 Gets the server time.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `time (string, formatted YYYY-mm-dd hh:mm:ss GMT-hh:mm)`
+*Returns:* `time (string, formatted YYYY-mm-dd hh:mm:ss GMT-hh:mm)`
 
 ### Location
 
-*Location.Weather*
+**Location.Weather**
 
 Fetches current weather for a given zip code.
 
-**Parameters:** `zip`, the zip code for the area
+*Parameters:* `zip`, the zip code for the area
 
-**Returns:**  
+*Returns:*  
 	`location`, the city and state for the conditions  
 	`text`, a description of the conditions  
 	`temp`, the current temperature (in Celcius)  
 	`date`, the date of the conditions  
 
+### Minecraft
+
+**Minecraft.MOTD**
+
+Gets the MOTD of the given server.
+
+*Parameters:* `server`
+
+*Returns:* `motd (string)`
+
+**Minecraft.Players**
+
+Gets the current player count of the given server.
+
+*Parameters:* `server`
+
+*Returns:* `players (string)`
+
+**Minecraft.MaxPlayers**
+
+Gets the max player count of the given server.
+
+*Parameters:* `server`
+
+*Returns:* `maxPlayers (string)`
+
 ### Network
 
-*Network.Ping*
+**Network.Ping**
 
 Pings a host from the server.
 
-**Parameters:** `host`, the host to ping
+*Parameters:* `host`, the host to ping
 
-**Returns:** `output (string)`
+*Returns:* `output (string)`
 
-*Network.DNS*
+**Network.DNS**
 
 Looks up a host from the server.
 
-**Parameters:** `host`, the host to lookup
+*Parameters:* `host`, the host to lookup
 
-**Returns:** `output (string)`
+*Returns:* `output (string)`
 
 ### Password
 
-*Password.Add*
+**Password.Add**
 
 Adds a password to the password manager.
 
-**Parameters:**  
+*Parameters:*  
 	`site`, the site for which the password is retrieved  
 	`new`, the new password that is added  
 	`master`, the encryption key and identity verification
 
-**Returns:** nothing
+*Returns:* nothing
 
-*Password.Retrieve*
+**Password.Retrieve**
 
 Retrieves a password from the password manager.
 
-**Parameters:**  
+*Parameters:*  
 	`site`, the site for which the password is retrieved  
 	`master`, the encryption key and identity verification
 
-**Returns:** `password (string)`
+*Returns:* `password (string)`
 
 ### XBMC
 
-*XBMC.GetPlayer*
+**XBMC.GetPlayer**
 
 Gets currently playing audio player.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `playerID (string)`
+*Returns:* `playerID (string)`
 
-*XBMC.Pause*
+**XBMC.Pause**
 
 Pauses current stream.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Next*
+**XBMC.Next**
 
 Skips to next song in queue.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Previous*
+**XBMC.Previous**
 
 Skips to previous song in queue.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Shuffle*
+**XBMC.Shuffle**
 
 Shuffles Now Playing queue.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Mute*
+**XBMC.Mute**
 
 Mutes XBMC.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Unmute*
+**XBMC.Unmute**
 
 Unmutes XBMC.
 
-**Parameters:** `none`
+*Parameters:* `none`
 
-**Returns:** `none`
+*Returns:* `none`
 
-*XBMC.Volume*
+**XBMC.Volume**
 
 Sets XBMC volume.
 
-**Parameters:** `volume (string)`
+*Parameters:* `volume (string)`
 
-**Returns:** `none`
+*Returns:* `none`
 
 ## Responses
 
