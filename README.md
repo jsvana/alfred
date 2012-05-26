@@ -1,4 +1,6 @@
-### Syntax
+#Alfred
+
+## Syntax
 
 Commands are sent to Alfred in the following format:
 
@@ -46,9 +48,9 @@ if you successfully logged in, or in the form
 
 if there was an error.
 
-### Commands
+## Commands
 
-#### Alfred
+### Alfred
 
 *Alfred.Login*
 
@@ -68,7 +70,7 @@ Gets the server time.
 
 **Returns:** `time (string, formatted YYYY-mm-dd hh:mm:ss GMT-hh:mm)`
 
-#### Location
+### Location
 
 *Location.Weather*
 
@@ -82,7 +84,7 @@ Fetches current weather for a given zip code.
 	`temp`, the current temperature (in Celcius)  
 	`date`, the date of the conditions  
 
-#### Network
+### Network
 
 *Network.Ping*
 
@@ -100,7 +102,7 @@ Looks up a host from the server.
 
 **Returns:** `output (string)`
 
-#### Password
+### Password
 
 *Password.Add*
 
@@ -123,7 +125,7 @@ Retrieves a password from the password manager.
 
 **Returns:** `password (string)`
 
-#### XBMC
+### XBMC
 
 *XBMC.GetPlayer*
 
@@ -189,7 +191,7 @@ Sets XBMC volume.
 
 **Returns:** `none`
 
-### Responses
+## Responses
 
 Responses take the form
 
@@ -201,11 +203,11 @@ Responses take the form
 
 If the code is less than zero, the response is an error.  Otherwise, the response is a successful result.
 
-#### Results
+### Results
 
 
 
-#### Errors
+### Errors
 
 `-1` - `Malformed command`: the command JSON was not formatted correctly  
 `-2` - `Unknown command`: the user specified an unknown method  
