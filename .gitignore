@@ -1,3 +1,4 @@
 alfred.rpc
 *.o
 *.swp
+.DS_Store
