@@ -37,6 +37,73 @@
 
 			break;
 
+		/* Location */
+		case "Location.Weather":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else if(!isset($data->{'params'}->{'zip'})) {
+				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
+			} else {
+				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
+				$weather = simplexml_load_string($weather_feed);
+				if(!$weather) die('weather failed');
+				$copyright = $weather->channel->copyright;
+
+				$channel_yweather = $weather->channel->children("http://xml.weather.yahoo.com/ns/rss/1.0");
+
+				foreach($channel_yweather as $x => $channel_item) 
+					foreach($channel_item->attributes() as $k => $attr) 
+						$yw_channel[$x][$k] = $attr;
+
+				$item_yweather = $weather->channel->item->children("http://xml.weather.yahoo.com/ns/rss/1.0");
+
+				foreach($item_yweather as $x => $yw_item) {
+					foreach($yw_item->attributes() as $k => $attr) {
+						if($k == 'day') $day = $attr;
+						if($x == 'forecast') { $yw_forecast[$x][$day . ''][$k] = $attr;	} 
+						else { $yw_forecast[$x][$k] = $attr; }
+					}
+				}
+
+				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
+			}
+			break;
+
+		/* Network */
+		case "Network.Ping":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else if(!isset($data->{'params'}->{'host'})) {
+				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+			} else {
+				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
+
+				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"" . $output . "\"}}}";
+			}
+			break;
+		case "Network.DNS":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else if(!isset($data->{'params'}->{'host'})) {
+				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+			} else {
+				$output = shell_exec("dig " . $data->{'params'}->{'host'});
+
+				$arr = explode("\n", $output);
+
+				$res = array_search(";; ANSWER SECTION:", $arr);
+
+				if($res !== false) {
+					$line = $arr[$res + 1];
+					$tokens = explode("\t", $line);
+
+					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"" . $tokens[0] . " " . $tokens[count($tokens) - 1] . "\"}}}";
+				} else {
+					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"Unknown host.\"}}}";
+				}
+			}
+			break;
+
 		/* Password */
 		case "Password.Retrieve":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
@@ -140,50 +207,7 @@
 			}
 			break;
 
-		/* Location */
-		case "Location.Weather":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'zip'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
-			} else {
-				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
-				$weather = simplexml_load_string($weather_feed);
-				if(!$weather) die('weather failed');
-				$copyright = $weather->channel->copyright;
-
-				$channel_yweather = $weather->channel->children("http://xml.weather.yahoo.com/ns/rss/1.0");
-
-				foreach($channel_yweather as $x => $channel_item) 
-					foreach($channel_item->attributes() as $k => $attr) 
-						$yw_channel[$x][$k] = $attr;
-
-				$item_yweather = $weather->channel->item->children("http://xml.weather.yahoo.com/ns/rss/1.0");
-
-				foreach($item_yweather as $x => $yw_item) {
-					foreach($yw_item->attributes() as $k => $attr) {
-						if($k == 'day') $day = $attr;
-						if($x == 'forecast') { $yw_forecast[$x][$day . ''][$k] = $attr;	} 
-						else { $yw_forecast[$x][$k] = $attr; }
-					}
-				}
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
-			}
-			break;
-
-		/* Network */
-		case "Network.Ping":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'host'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
-			} else {
-				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"" . $output . "\"}}}";
-			}
-			break;
+		/* Unknown command */
 		default:
 			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
 			break;
