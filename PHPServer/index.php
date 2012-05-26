@@ -7,7 +7,7 @@
 		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}}";
 		return;
 	}
-	
+
 	$method = $data->{'method'};
 
 	mysql_connect("localhost", "alfred", "my_cocaine");
@@ -72,13 +72,12 @@
 			} else {
 				$ch = curl_init();
 
-				curl_setopt($ch, CURLOPT_URL, "http://67.149.240.147:8080/jsonrpc");
+				curl_setopt($ch, CURLOPT_URL, "http://xbmc:1123581321!@67.149.240.147:8080/jsonrpc");
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
 
 				$result = curl_exec($ch);
-				var_dump($result);
 
 				curl_close($ch);
 
