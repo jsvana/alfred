@@ -1,14 +1,15 @@
 PROG = alfred
-OBJS = main.o
+OBJS = main.o json.o error.o
+MODULES = alfred.o location.o network.o password.o xbmc.o
 LIBS = json glib-2.0
 
 CC = gcc
 CFLAGS = -ggdb -Wall -ggdb $(shell pkg-config --cflags ${LIBS})
-LDFLAGS = $(shell pkg-config --libs ${LIBS}) 
+LDFLAGS = $(shell pkg-config --libs ${LIBS}) -Wl,-rpath -Wl,/usr/local/lib
 
 all: ${PROG}
 
-${PROG}: ${OBJS}
+${PROG}: ${OBJS} ${MODULES}
 	@echo ${CC} -o ${PROG}
 	@${CC} ${CFLAGS} -o $@ $+ ${LDFLAGS}
 
@@ -19,11 +20,7 @@ ${PROG}: ${OBJS}
 run: all
 	./${PROG}
 
-install: all
-	@echo Installing to /usr/local/bin
-	@install -t /usr/local/bin ${PROG}
-
 clean:
-	rm -f ${PROG} ${OBJS}
+	rm -f ${PROG} ${OBJS} ${MODULES}
 
 .PHONY: all clean install
