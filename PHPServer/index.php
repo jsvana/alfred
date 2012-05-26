@@ -13,6 +13,11 @@
 	mysql_connect("localhost", "alfred", "my_cocaine");
 	mysql_select_db("alfred");
 
+	$XBMC_USERNAME = "xbmc";
+	$XBMC_PASSWORD = "1123581321!";
+	$XBMC_HOST = "67.149.240.147";
+	$XBMC_PORT = "8080";
+
 	$ret = "";
 
 	switch($method) {
@@ -72,10 +77,29 @@
 			} else {
 				$ch = curl_init();
 
-				curl_setopt($ch, CURLOPT_URL, "http://xbmc:1123581321!@67.149.240.147:8080/jsonrpc");
+				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$result = curl_exec($ch);
+
+				curl_close($ch);
+
+				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
+			}
+			break;
+		case "XBMC.Mute":
+		case "XBMC.Unmute":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
+			} else {
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": { \"mute\": " . ($method === "XBMC.Mute" ? "true" : "false") . " }, \"id\": 1}");
 
 				$result = curl_exec($ch);
 
