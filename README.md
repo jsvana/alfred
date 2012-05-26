@@ -33,7 +33,9 @@ To initiate a session, you send
 and the server will send you back a reply in the form
 
 	{
-		"result": {
+		"code": 0,
+		"message": "Method success.",
+		"data": {
 			"key": "fc2baa1a20b4d5190b122b383d7449fd"
 		}
 	}
@@ -41,8 +43,9 @@ and the server will send you back a reply in the form
 if you successfully logged in, or in the form
 
 	{
-		"error": {
-			"code": -2,
+		"code": -5,
+		"message": "Method failed.",
+		"data": {
 			"message": "Incorrect username or password."
 		}
 	}
