@@ -191,16 +191,28 @@
 			} else if(!isset($data->{'params'}->{'zip'})) {
 				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
 			} else {
-				$ch = curl_init();
+				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
+				$weather = simplexml_load_string($weather_feed);
+				if(!$weather) die('weather failed');
+				$copyright = $weather->channel->copyright;
 
-				curl_setopt($ch, CURLOPT_URL, "http://xml.weather.yahoo.com/forecastrss?p=" . $data->{'params'}->{'zip'});
-				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				$channel_yweather = $weather->channel->children("http://xml.weather.yahoo.com/ns/rss/1.0");
 
-				$result = curl_exec($ch);
-				
-				$xml = new SimpleXMLElement($result);
+				foreach($channel_yweather as $x => $channel_item) 
+					foreach($channel_item->attributes() as $k => $attr) 
+						$yw_channel[$x][$k] = $attr;
 
-				curl_close($ch);
+				$item_yweather = $weather->channel->item->children("http://xml.weather.yahoo.com/ns/rss/1.0");
+
+				foreach($item_yweather as $x => $yw_item) {
+					foreach($yw_item->attributes() as $k => $attr) {
+						if($k == 'day') $day = $attr;
+						if($x == 'forecast') { $yw_forecast[$x][$day . ''][$k] = $attr;	} 
+						else { $yw_forecast[$x][$k] = $attr; }
+					}
+				}
+
+				var_dump($yw_forecast);
 
 				if($xml->rss->channel->title === "Yahoo! Weather - Error") {
 					$ret = "{\"error\":{\"code\":-5,\"message\":\"Unable to find weather for zip '" . $data->{'params'}->{'zip'} . ".\"}}";
