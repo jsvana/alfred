@@ -74,9 +74,11 @@
 
 				curl_setopt($ch, CURLOPT_URL, "http://67.149.240.147:8080/jsonrpc");
 				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
 
 				$result = curl_exec($ch);
+				var_dump($result);
 
 				curl_close($ch);
 
