@@ -48,15 +48,49 @@ if there was an error.
 
 ### Commands
 
-#### App
+#### Alfred
 
-*App.Login*
+*Alfred.Login*
 
 Initiates session with the server.
 
-**Parameters:** username, password
+**Parameters:**  
+	`username`, the username for the user  
+	`password`, the password for the user
 
-**Returns:** API Key (string)
+**Returns:** `key (string)`
+
+*Alfred.Time*
+
+Gets the server time.
+
+**Parameters:** `none`
+
+**Returns:** `time (string)`
+
+#### Location
+
+*Location.Weather*
+
+Fetches current weather for a given zip code.
+
+**Parameters:** `zip`, the zip code for the area
+
+**Returns:**  
+	`location`, the city and state for the conditions  
+	`text`, a description of the conditions  
+	`temp`, the current temperature (in Celcius)  
+	`date`, the date of the conditions  
+
+#### Network
+
+*Network.Ping*
+
+Pings a host from the server.
+
+**Parameters:** `host`, the host to ping
+
+**Returns:** `output (string)`
 
 #### Password
 
@@ -146,17 +180,3 @@ Sets XBMC volume.
 **Parameters:** `volume (string)`
 
 **Returns:** `none`
-
-#### Weather
-
-*Weather.Current*
-
-Fetches current weather for a given zip code.
-
-**Parameters:** `zip (string)`
-
-**Returns:**  
-	`location`, the city and state for the conditions  
-	`text`, a description of the conditions  
-	`temp`, the current temperature (in Celcius)  
-	`date`, the date of the conditions  

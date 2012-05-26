@@ -21,7 +21,8 @@
 	$ret = "";
 
 	switch($method) {
-		case "App.Login":
+		/* Alfred */
+		case "Alfred.Login":
 			$username = $data->{'params'}->{'username'};
 			$password = $data->{'params'}->{'password'};
 
@@ -34,6 +35,12 @@
 				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
 			}
 			break;
+		case "Alfred.Time":
+			$ret = "{\"result\":{\"message\":\"Time retrieved.\",\"data\":\"" . date("Y-m-d H:i:s \G\M\TP") . "\"}}";
+
+			break;
+
+		/* Password */
 		case "Password.Retrieve":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
@@ -71,6 +78,8 @@
 				}
 			}
 			break;
+
+		/* XBMC */
 		case "XBMC.Pause":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
@@ -185,7 +194,9 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":" . json_encode($resultJSON->{'result'}) . "}}";
 			}
 			break;
-		case "Weather.Current":
+
+		/* Location */
+		case "Location.Weather":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
 			} else if(!isset($data->{'params'}->{'zip'})) {
@@ -215,6 +226,8 @@
 				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
 			}
 			break;
+
+		/* Network */
 		case "Network.Ping":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
 				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
