@@ -22,6 +22,7 @@ To initiate a session, you send
 
 	{
 		"alfred": "0.1",
+		"key": "",
 		"method": "App.Login",
 		"params": {
 			"username": "linus",
