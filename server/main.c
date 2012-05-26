@@ -8,6 +8,7 @@
 #include "json.h"
 #include "sql.h"
 #include "error.h"
+#include "utils.h"
 
 // Include modules
 #include "alfred.h"
@@ -72,6 +73,8 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
+	alfred_auth_set_key(key);
+
 	alfred_sql_init();
 
 	gchar **info = g_strsplit(method, ".", 2);
@@ -79,26 +82,29 @@ int main(int argc, char *argv[]) {
 	if (info && info[0] && info[1]) {
 		if (strcmp(info[0], "Alfred") == 0) {
 			alfred_module_alfred(info[1], params);
-		} else if (alfred_authenticated(key)) {
-			if (strcmp(info[0], "Location") == 0) {
-				alfred_module_location(info[1], params);
-			} else if (strcmp(info[0], "Network") == 0) {
-				alfred_module_network(info[1], params);
-			} else if (strcmp(info[0], "Password") == 0) {
-				alfred_module_password(info[0], params);
-			} else if (strcmp(info[0], "XBMC") == 0) {
-				alfred_module_xbmc(info[0], params);
-			} else {
-				alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
-			}
-		} else {
+		} else if (strcmp(info[0], "Location") == 0) {
+			alfred_module_location(info[1], params);
+		} else if (strcmp(info[0], "Network") == 0) {
+			alfred_module_network(info[1], params);
+		} else if (strcmp(info[0], "Password") == 0) {
+			alfred_module_password(info[0], params);
+		} else if (strcmp(info[0], "XBMC") == 0) {
+			alfred_module_xbmc(info[0], params);
+		} else if (!alfred_authed()) {
 			alfred_error_static(ALFRED_ERROR_NOT_AUTHENTICATED);
+		} else {
+			alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 		}
+	} else if (!alfred_authed()) {
+		alfred_error_static(ALFRED_ERROR_NOT_AUTHENTICATED);
 	} else {
 		alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 	}
 
 	alfred_sql_shutdown();
+
+	// For good measure
+	alfred_auth_forget_key();
 	
 	g_strfreev(info);
 	g_free(method);

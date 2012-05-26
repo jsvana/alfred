@@ -37,21 +37,3 @@ char *alfred_sql_escape_string(const char *data) {
 
 	return str;
 }
-
-int alfred_authenticated(const char *key) {
-	MYSQL *conn = alfred_sql_connection();
-	char *escaped_key = alfred_sql_escape_string(key);
-	
-	char *query = g_strconcat("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='", escaped_key, "' AND `expiration`>NOW() LIMIT 1;", NULL);
-
-	// TODO: Check error
-	mysql_query(conn, query);
-	my_ulonglong rows = mysql_affected_rows(conn);
-
-	// TODO: Check: we shouldn't need to call mysql_use_result or mysql_store_result
-
-	g_free(escaped_key);
-	g_free(query);
-
-	return rows == 1;
-}
