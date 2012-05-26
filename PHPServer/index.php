@@ -49,7 +49,7 @@
 			} else if(($message = validate_parameters($params, array("zip"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
+				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $params->zip . "&u=c");
 				$weather = simplexml_load_string($weather_feed);
 				if(!$weather) die('weather failed');
 				$copyright = $weather->channel->copyright;
