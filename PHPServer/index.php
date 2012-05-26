@@ -207,7 +207,7 @@
 				} else {
 					$item = $xml->rss->channel->item;
 
-					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"title\":\"" . $item->title . "\",\"text\":\"" . $item->{'yweather:condition'}->attributes('text') . "\",\"temp\":\"" . $item->{'yweather:condition'}->attributes('temp') . "\"}}}";
+					$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"title\":\"" . $item->title . "\",\"text\":\"" . $item->{'condition'}->attributes('text') . "\",\"temp\":\"" . $item->{'yweather:condition'}->attributes('temp') . "\"}}}";
 				}
 			}
 			break;
