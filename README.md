@@ -214,3 +214,4 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 `-3` - `Not authenticated`: the user has not yet authenticated  
 `-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
 `-5` - `Method failed`: the method did not execute successfully  
+`-6` - `Internal server error`: something went wrong inside of Alfred  

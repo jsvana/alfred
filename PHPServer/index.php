@@ -74,6 +74,59 @@
 			}
 			break;
 
+		/* Minecraft */
+		case "Minecraft.MOTD":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("server"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$serverArr = explode(":", $params->server);
+
+				if(count($serverArr) === 1) {
+					$result = minecraft_ping($serverArr[0]);
+				} else {
+					$result = minecraft_ping($serverArr[1]);
+				}
+
+				$ret = alfred_result(0, array("motd" => $result['motd']));
+			}
+			break;
+		case "Minecraft.Players":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("server"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$serverArr = explode(":", $params->server);
+
+				if(count($serverArr) === 1) {
+					$result = minecraft_ping($serverArr[0]);
+				} else {
+					$result = minecraft_ping($serverArr[1]);
+				}
+
+				$ret = alfred_result(0, array("players" => $result['players']));
+			}
+			break;
+		case "Minecraft.MaxPlayers":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("server"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$serverArr = explode(":", $params->server);
+
+				if(count($serverArr) === 1) {
+					$result = minecraft_ping($serverArr[0]);
+				} else {
+					$result = minecraft_ping($serverArr[1]);
+				}
+
+				$ret = alfred_result(0, array("maxPlayers" => $result['maxPlayers']));
+			}
+			break;
+
 		/* Network */
 		case "Network.Ping":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
@@ -81,7 +134,7 @@
 			} else if(($message = validate_parameters($params, array("host"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
+				$output = shell_exec("ping -c 1 " . $params->host);
 
 				$ret = alfred_result(0, array("reponse" => $output));
 			}
@@ -92,7 +145,7 @@
 			} else if(($message = validate_parameters($params, array("host"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$output = shell_exec("dig " . $data->{'params'}->{'host'});
+				$output = shell_exec("dig " . $params->host);
 
 				$arr = explode("\n", $output);
 
@@ -314,12 +367,42 @@
 		return $json;
 	}
 
+	function minecraft_ping($host, $port = 25565, $timeout = 30) {
+		//Set up our socket
+		$fp = fsockopen($host, $port, $errno, $errstr, $timeout);
+		if (!$fp) return false;
+
+		//Send 0xFE: Server list ping
+		fwrite($fp, "\xFE");
+
+		//Read as much data as we can (max packet size: 241 bytes)
+		$d = fread($fp, 256);
+
+		//Check we've got a 0xFF Disconnect
+		if ($d[0] != "\xFF") return false;
+
+		//Remove the packet ident (0xFF) and the short containing the length of the string
+		$d = substr($d, 3);
+
+		//Decode UCS-2 string
+		$d = mb_convert_encoding($d, 'auto', 'UCS-2');
+
+		//Split into array
+		$d = explode("\xA7", $d);
+
+		//Return an associative array of values
+		return array(
+			'motd'        =>        $d[0],
+			'players'     => intval($d[1]),
+			'maxPlayers' => intval($d[2]));
+	}
+
 	function xbmc_request($data) {
 		global $XBMC_USERNAME;
 		global $XBMC_PASSWORD;
 		global $XBMC_HOST;
 		global $XBMC_PORT;
-		
+
 		$ch = curl_init();
 
 		curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
