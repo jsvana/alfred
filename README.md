@@ -205,7 +205,7 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 ### Results
 
-
+`0` - `Method success`: the method executed successfully
 
 ### Errors
 
@@ -213,4 +213,4 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 `-2` - `Unknown command`: the user specified an unknown method  
 `-3` - `Not authenticated`: the user has not yet authenticated  
 `-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
-`-5` - `Method failed`: method did not execute successfully  
+`-5` - `Method failed`: the method did not execute successfully  
