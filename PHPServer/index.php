@@ -38,7 +38,7 @@
 			}
 			break;
 		case "Alfred.Time":
-			\$ret = alfred_result(0, array("time" => date("Y-m-d H:i:s \G\M\TP")));
+			$ret = alfred_result(0, array("time" => date("Y-m-d H:i:s \G\M\TP")));
 
 			break;
 
