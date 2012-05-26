@@ -174,14 +174,15 @@
 				curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				curl_setopt($ch, CURLOPT_POSTFIELDS, "{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
 
 				$result = curl_exec($ch);
-				var_dump($result);
+				
+				$resultJSON = json_decode($result);
 
 				curl_close($ch);
 
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
+				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":" . json_encode($resultJSON->{'result'}) . "}}";
 			}
 			break;
 		default:
