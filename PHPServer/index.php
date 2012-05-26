@@ -3,7 +3,7 @@
 
 	include("config.php");
 
-	$data = json_decode($_POST['json']);
+	$data = json_decode(file_get_contents("php://input"));
 
 	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
 		echo alfred_error(-1);
