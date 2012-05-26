@@ -207,8 +207,8 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 #### Errors
 
-`-1` - `Malformed command`: the command JSON was not formatted correctly
-`-2` - `Unknown command`: the user specified an unknown method
-`-3` - `Not authenticated`: the user has not yet authenticated
-`-4` - `Incorrect parameters`: parameter(s) are invalid or missing
-`-5` - `Method failed`: method did not execute successfully
+`-1` - `Malformed command`: the command JSON was not formatted correctly  
+`-2` - `Unknown command`: the user specified an unknown method  
+`-3` - `Not authenticated`: the user has not yet authenticated  
+`-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
+`-5` - `Method failed`: method did not execute successfully  
