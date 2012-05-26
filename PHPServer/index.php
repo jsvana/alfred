@@ -100,6 +100,6 @@
 
 	function session_authenticated($key) {
 		$result = mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($key) . "' AND `expiration`>NOW();");
-		return mysql_affected_rows($result) > 0;
+		return mysql_affected_rows() > 0;
 	}
 ?>
