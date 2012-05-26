@@ -5,12 +5,13 @@
 
 	$data = json_decode($_POST['json']);
 
-	if(!isset($data) || !isset($data->{'method'})) {
-		echo "{\"error\":{\"code\":-1,\"message\":\"Malformed command.\"}}";
+	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
+		echo alfred_error(-1);
 		return;
 	}
 
-	$method = $data->{'method'};
+	$method = $data->method;
+	$params = $data->params;
 
 	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
 	mysql_select_db($MYSQL_DATABASE);
@@ -20,132 +21,33 @@
 	switch($method) {
 		/* Alfred */
 		case "Alfred.Login":
-			$username = $data->{'params'}->{'username'};
-			$password = $data->{'params'}->{'password'};
-
-			if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
-				$key = md5($username . $password . time());
-				mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
-
-				$ret = "{\"result\":{\"key\":\"" . $key . "\"}}";
+			if(($message = validate_parameters($params, array("username", "password"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = "{\"error\":{\"code\":-2,\"message\":\"Incorrect username or password.\"}}";
+				$username = $data->params->username;
+				$password = $data->params->password;
+
+				if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
+					$key = md5($username . $password . time());
+					mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
+
+					$ret = alfred_result(0, array("key" => $key));
+				} else {
+					$ret = alfred_error(-5, array("message" => "Incorrect username or password."));
+				}
 			}
 			break;
 		case "Alfred.Time":
-			$ret = "{\"result\":{\"message\":\"Time retrieved.\",\"data\":\"" . date("Y-m-d H:i:s \G\M\TP") . "\"}}";
+			$ret = alfred_result(0, array("time" => date("Y-m-d H:i:s \G\M\TP")));
 
-			break;
-
-		/* Password */
-		case "Password.Retrieve":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'master'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'site'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'site' not set.\"}}}";
-			} else {
-				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
-				if(mysql_num_rows($result) === 0) {
-					$ret = "{\"error\":{\"code\":-5,\"message\":\"Site not in database.\",\"data\":{}}}";
-				} else {
-					$row = mysql_fetch_assoc($result);
-					$pass = decrypt($row['password'], $data->{'params'}->{'master'});
-					$ret = "{\"result\":{\"password\":\"" . $pass . "\",\"master\":\"" . $data->{'params'}->{'master'} . "\"}}";
-				}
-			}
-			break;
-		case "Password.Add":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'master'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'master' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'site'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'site' not set.\"}}}";
-			} else if(!isset($data->{'params'}->{'new'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'new' not set.\"}}}";
-			} else {
-				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
-				if(mysql_num_rows($result) === 0) {
-					mysql_query("INSERT INTO `passwords` (site, password) VALUES ('" . mysql_real_escape_string($data->{'params'}->{'site'}) . "', '" . encrypt($data->{'params'}->{'new'}, $data->{'params'}->{'master'}) . "');");
-					$ret = "{\"result\":{\"message\":\"Password inserted successfully.\"}}";
-				} else {
-					$ret = "{\"error\":{\"code\":-5,\"message\":\"Site not in database.\",\"data\":{}}}";
-				}
-			}
-			break;
-
-		/* XBMC */
-		case "XBMC.Pause":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
-			}
-			break;
-		case "XBMC.Mute":
-		case "XBMC.Unmute":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": { \"mute\": " . ($method === "XBMC.Mute" ? "true" : "false") . " }, \"id\": 1}");
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
-			}
-			break;
-		case "XBMC.Next":
-		case "XBMC.Previous":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Go" . ($method === "XBMC.Next" ? "Next" : "Previous") . "\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
-			}
-			break;
-		case "XBMC.Volume":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'volume'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'volume' not set.\"}}}";
-			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " . $data->{'params'}->{'volume'} . " }, \"id\": 1}");
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
-			}
-			break;
-		case "XBMC.Shuffle":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Shuffle\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\"}}";
-			}
-			break;
-		case "XBMC.GetPlayer":
-			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else {
-				$result = xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
-				
-				$resultJSON = json_decode($result);
-
-				curl_close($ch);
-
-				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":" . json_encode($resultJSON->{'result'}) . "}}";
-			}
 			break;
 
 		/* Location */
 		case "Location.Weather":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'zip'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'zip' not set.\"}}}";
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("zip"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
 			} else {
 				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $data->{'params'}->{'zip'} . "&u=c");
 				$weather = simplexml_load_string($weather_feed);
@@ -168,28 +70,249 @@
 					}
 				}
 
-				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"location\":\"" . $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'] . "\",\"text\":\"" . $yw_forecast['condition']['text'] . "\",\"temp\":\"" . $yw_forecast['condition']['temp'] . "\",\"date\":\"" . $yw_forecast['condition']['date'] . "\"}}}";
+				$ret = alfred_result(0, array("location" => $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'], "text" => $yw_forecast['condition']['text'], "temp" => $yw_forecast['condition']['temp'], "date" => $yw_forecast['condition']['date']));
 			}
 			break;
 
 		/* Network */
 		case "Network.Ping":
 			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
-				$ret = "{\"error\":{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}}";
-			} else if(!isset($data->{'params'}->{'host'})) {
-				$ret = "{\"error\":{\"code\":-4,\"message\":\"Invalid parameters.\",\"data\":{\"message\":\"Parameter 'host' not set.\"}}}";
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("host"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
 			} else {
 				$output = shell_exec("ping -c 1 " . $data->{'params'}->{'host'});
 
-				$ret = "{\"result\":{\"message\":\"Command sent.\", \"data\":{\"result\":\"" . $output . "\"}}}";
+				$ret = alfred_result(0, array("reponse" => $output));
 			}
 			break;
+		case "Network.DNS":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("host"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$output = shell_exec("dig " . $data->{'params'}->{'host'});
+
+				$arr = explode("\n", $output);
+
+				$res = array_search(";; ANSWER SECTION:", $arr);
+
+				if($res !== false) {
+					$line = $arr[$res + 1];
+					$tokens = explode("\t", $line);
+
+					$ret = alfred_result(0, array("response" => $tokens[0] . " " . $tokens[count(tokens) - 1]));
+				} else {
+					$ret = alfred_result(0, array("response" => "Unknown host."));
+				}
+			}
+			break;
+
+		/* Password */
+		case "Password.Retrieve":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("master", "site"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
+				if(mysql_num_rows($result) === 0) {
+					$ret = alfred_error(-3, array("message" => "Site not in database."));
+				} else {
+					$row = mysql_fetch_assoc($result);
+					$pass = decrypt($row['password'], $data->{'params'}->{'master'});
+					$ret = alfred_result(0, array("password" => $pass));
+				}
+			}
+			break;
+		case "Password.Add":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("master", "site", "new"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$result = mysql_query("SELECT `password` FROM `passwords` WHERE `site`='" . mysql_real_escape_string($data->{'params'}->{'site'}) . "';");
+				if(mysql_num_rows($result) === 0) {
+					mysql_query("INSERT INTO `passwords` (site, password) VALUES ('" . mysql_real_escape_string($data->{'params'}->{'site'}) . "', '" . encrypt($data->{'params'}->{'new'}, $data->{'params'}->{'master'}) . "');");
+					$ret = alfred_result(0, array("message" => "Password inserted successfully."));
+				} else {
+					$ret = alfred_error(-3, array("message" => "Site not in database."));
+				}
+			}
+			break;
+
+		/* XBMC */
+		case "XBMC.Pause":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Mute":
+		case "XBMC.Unmute":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetMute\", \"params\": { \"mute\": " . ($method === "XBMC.Mute" ? "true" : "false") . " }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Next":
+		case "XBMC.Previous":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Go" . ($method === "XBMC.Next" ? "Next" : "Previous") . "\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Volume":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("volume"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Application.SetVolume\", \"params\": { \"volume\": " . $data->{'params'}->{'volume'} . " }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Shuffle":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.Shuffle\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.GetPlayer":
+			if(!isset($data->{'key'}) || $data->{'key'} === "" || !session_authenticated($data->{'key'})) {
+				$ret = alfred_error(-3);
+			} else {
+				$result = xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
+				
+				$resultJSON = json_decode($result);
+
+				curl_close($ch);
+
+				$ret = alfred_result(0, array("message" => "Command sent.", "playerid" => json_encode($resultJSON->{'result'})));
+			}
+			break;
+
+		/* Unknown command */
 		default:
-			$ret = "{\"error\":{\"code\":-1,\"message\":\"Unknown command.\",\"data\":{}}}";
+			$ret = alfred_error(-2);
 			break;
 	}
 
 	echo $ret;
+
+	function validate_parameters($params, $valid) {
+		if(count($params) > count(valid)) {
+			return "Too many parameters.";
+		}
+
+		$missing = array();
+		$empty = array();
+
+		foreach($valid as $key) {
+			if(!isset($params->{$key})) {
+				$missing[$key] = true;
+			} else if($params->{$key} === "") {
+				$empty[$key] = true;
+			}
+		}
+
+		$message = "";
+
+		if(count($missing) !== 0) {
+			$message = "Missing parameter" . (count($missing) === 1 ? "" : "s") . " '" . join("', '", array_keys($missing)) . "'";
+		}
+
+		if(count($empty) !== 0) {
+			if(count($message) !== 0) {
+				$message .= ", and parameter" . (count($empty) === 1 ? "" : "s") . " '";
+			} else {
+				$message = "Parameter" . (count($empty) === 1 ? "" : "s") . " '";
+			}
+
+			$message .= join("', '", array_keys($empty)) . "' cannot be empty";
+		}
+
+		if($message !== "") {
+			$message .= ".";
+		}
+
+		return $message;
+	}
+
+	function alfred_result($code, $data = null) {
+		$json = "";
+
+		switch($code) {
+			default:
+			case 0:
+				$json = "{\"code\":0,\"message\":\"Method success.\",\"data\":{";
+				if(isset($data)) {
+					$m = array();
+					foreach($data as $key => $datum) {
+						$m[] = "\"" . $key . "\":\"" . $datum . "\"";
+					}
+
+					$json .= join(",", $m);
+				}
+
+				$json .= "}}";
+
+				break;
+		}
+
+		return $json;
+	}
+
+	function alfred_error($code, $data = null) {
+		$json = "";
+
+		switch($code) {
+			default:
+			case -1:
+				$json = "{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}";
+				break;
+			case -2:
+				$json = "{\"code\":-2,\"message\":\"Unknown command.\",\"data\":{}}";
+				break;
+			case -3:
+				$json = "{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}";
+				break;
+			case -4:
+				$json = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{";
+
+				if(isset($data['message'])) {
+					$json .= "\"message\":\"" . $data['message'] . "\"";
+				}
+
+				$json .= "}}";
+				break;
+			case -5:
+				$json = "{\"code\":-5,\"message\":\"Method failed.\",\"data\":{";
+
+				if(isset($data['message'])) {
+					$json .= "\"message\":\"" . $data['message'] . "\"";
+				}
+
+				$json .= "}}";
+				break;
+		}
+
+		return $json;
+	}
 
 	function xbmc_request($data) {
 		$ch = curl_init();

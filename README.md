@@ -1,4 +1,6 @@
-### Syntax
+# Alfred
+
+## Syntax
 
 Commands are sent to Alfred in the following format:
 
@@ -46,9 +48,9 @@ if you successfully logged in, or in the form
 
 if there was an error.
 
-### Commands
+## Commands
 
-#### Alfred
+### Alfred
 
 *Alfred.Login*
 
@@ -68,7 +70,7 @@ Gets the server time.
 
 **Returns:** `time (string, formatted YYYY-mm-dd hh:mm:ss GMT-hh:mm)`
 
-#### Location
+### Location
 
 *Location.Weather*
 
@@ -82,7 +84,7 @@ Fetches current weather for a given zip code.
 	`temp`, the current temperature (in Celcius)  
 	`date`, the date of the conditions  
 
-#### Network
+### Network
 
 *Network.Ping*
 
@@ -92,7 +94,15 @@ Pings a host from the server.
 
 **Returns:** `output (string)`
 
-#### Password
+*Network.DNS*
+
+Looks up a host from the server.
+
+**Parameters:** `host`, the host to lookup
+
+**Returns:** `output (string)`
+
+### Password
 
 *Password.Add*
 
@@ -115,7 +125,7 @@ Retrieves a password from the password manager.
 
 **Returns:** `password (string)`
 
-#### XBMC
+### XBMC
 
 *XBMC.GetPlayer*
 
@@ -180,3 +190,27 @@ Sets XBMC volume.
 **Parameters:** `volume (string)`
 
 **Returns:** `none`
+
+## Responses
+
+Responses take the form
+
+	{
+		"code": -1,
+		"message": "Malformed command.",
+		"data": { }
+	}
+
+If the code is less than zero, the response is an error.  Otherwise, the response is a successful result.
+
+### Results
+
+`0` - `Method success`: the method executed successfully
+
+### Errors
+
+`-1` - `Malformed command`: the command JSON was not formatted correctly  
+`-2` - `Unknown command`: the user specified an unknown method  
+`-3` - `Not authenticated`: the user has not yet authenticated  
+`-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
+`-5` - `Method failed`: the method did not execute successfully  
