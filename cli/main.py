@@ -240,8 +240,10 @@ def processCommand(cmd):
 	postData = postData.encode('utf-8')
 	req = urllib.request.Request(url, postData)
 	responseData = urllib.request.urlopen(req)
+	text = responseData.read()
+	print(text)
 	
-	retJson = json.loads(responseData.read().decode('utf-8'))
+	retJson = json.loads(text.decode('utf-8'))
 
 	if 'code' in retJson:
 		try:
