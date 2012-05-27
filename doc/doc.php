@@ -1,5 +1,8 @@
 <?php
+	$template = file_get_contents('template.md');
 	$fp = fopen('test.md', 'w');
+
+	fwrite($fp, $template);
 
 	$json = json_decode(file_get_contents("server_methods.json"));
 
