@@ -2,3 +2,5 @@ alfred.rpc
 *.o
 *.swp
 .DS_Store
+config.php
+config.h
