@@ -32,8 +32,8 @@
 				"returns" : [
 					{
 						"name" : "time",
-						"type" : "string",
-						"format" : "YYYY-mm-dd hh:mm:ss GMT-hh:mm"
+						"description" : "Alfred's system time, in the format YYYY-mm-dd hh:mm:ss GMT-hh:mm",
+						"type" : "string"
 					}
 				]
 			}

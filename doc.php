@@ -18,6 +18,20 @@
 				foreach($method->parameters as $parameter) {
 					fwrite($fp, "`" . $parameter->name . " (" . $parameter->type . ")`, " . $parameter->description . "  \n");
 				}
+
+				fwrite($fp, "\n");
+			}
+
+			if(count($method->returns) == 0) {
+				fwrite($fp, "*Returns:* `none`\n\n");
+			} else {
+				fwrite($fp, "*Returns:*\n");
+
+				foreach($method->returns as $return) {
+					fwrite($fp, "`" . $return->name . " (" . $return->type . ")`, " . $return->description . "  \n");
+				}
+
+				fwrite($fp, "\n");
 			}
 		}
 	}
