@@ -187,7 +187,7 @@
 			} else if(($message = validate_parameters($params, array("user"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("tweet" => file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" . url_encode($params->user) . "&count=1")));
+				$ret = alfred_result(0, array("tweet" => escape_quotes(file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" . url_encode($params->user) . "&count=1"))));
 			}
 			break;
 
@@ -462,6 +462,10 @@
 	    $entities = array('%21', '%2A', '%27', '%28', '%29', '%3B', '%3A', '%40', '%26', '%3D', '%2B', '%24', '%2C', '%2F', '%3F', '%25', '%23', '%5B', '%5D');
 	    $replacements = array('!', '*', "'", "(", ")", ";", ":", "@", "&", "=", "+", "$", ",", "/", "?", "%", "#", "[", "]");
 	    return str_replace($entities, $replacements, urlencode($string));
+	}
+
+	function escape_quotes($string) {
+		return str_replace("\\\"", "\"", $string);
 	}
 
 	function xbmc_request($data) {
