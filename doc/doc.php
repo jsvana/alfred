@@ -10,7 +10,8 @@
 		fwrite($fp, "### " . $namespace->namespace . "\n\n");
 
 		foreach($namespace->methods as $method) {
-			fwrite($fp, "**" . $method->method . "**\n\n");
+			$methodName = substr($method->method, count($namespace->namespace) + 2);
+			fwrite($fp, "**" . $namespace->namespace . "**.***" $methodName . "***\n\n");
 			fwrite($fp, $method->description . "\n\n");
 
 			if(count($method->parameters) == 0) {

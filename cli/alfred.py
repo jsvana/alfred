@@ -126,6 +126,7 @@ class Alfred(cmd.Cmd, object):
 
 	def do_time(self, s):
 		(code, data) = self.request('Alfred.Time')
+		if code >= 0: print(data['data']['time'])
 
 	def complete_password(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['retrieve', 'add'])
@@ -176,6 +177,20 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Twitter command.")
 		else:
 			print("Unknown Twitter command.")
+
+	def help_weather(self):
+		print('weather <zip>')
+
+	def do_weather(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			(code, data) = self.request('Location.Weather', {'zip': args[0]})
+			if code >= 0:
+				print("Weather for " + data['data']['location'] + ": " + data['data']['temp'] + "\u00b0C, " + data['data']['text'])
+			else:
+				print("Unknown Twitter command.")
+		else:
+			print("Please specify a location.")
 
 	def help_login(self):
 		print('login <username> <password>')
