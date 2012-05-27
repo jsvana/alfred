@@ -177,7 +177,7 @@ Pauses current stream.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Next**
 
@@ -185,7 +185,7 @@ Skips to next song in queue.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Previous**
 
@@ -193,7 +193,7 @@ Skips to previous song in queue.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Shuffle**
 
@@ -201,7 +201,7 @@ Shuffles Now Playing queue.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Mute**
 
@@ -209,7 +209,7 @@ Mutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Unmute**
 
@@ -217,7 +217,7 @@ Unmutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Up**
 
@@ -225,7 +225,7 @@ Moves XBMC selection up.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Down**
 
@@ -233,7 +233,7 @@ Moves XBMC selection down.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Left**
 
@@ -241,7 +241,7 @@ Moves XBMC selection left.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Right**
 
@@ -249,7 +249,7 @@ Moves XBMC selection right.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Select**
 
@@ -257,7 +257,7 @@ Makes XBMC selection.
 
 *Parameters:* `none`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 **XBMC.Volume**
 
@@ -265,7 +265,7 @@ Sets XBMC volume.
 
 *Parameters:* `volume (string)`
 
-*Returns:* `none`
+*Returns:* `message (string)`
 
 ## Responses
 

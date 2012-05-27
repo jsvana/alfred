@@ -108,8 +108,8 @@ def processCommand(cmd):
 			return
 
 		host = words[1]
-		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Network.Ping\",\"params\":{\"host\":\"" + host + "\"}}"
-		retCommand = "Network.Ping"
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Ping\",\"params\":{\"host\":\"" + host + "\"}}"
+		retCommand = "Net.Ping"
 
 	elif words[0] == "dns":
 		if len(words) < 2:
@@ -117,8 +117,17 @@ def processCommand(cmd):
 			return
 
 		dnsHost = words[1]
-		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Network.DNS\",\"params\":{\"host\":\"" + dnsHost + "\"}}"
-		retCommand = "Network.DNS"
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.DNS\",\"params\":{\"host\":\"" + dnsHost + "\"}}"
+		retCommand = "Net.DNS"
+
+	elif words[0] == "shorten":
+		if len(words) < 2:
+			print("Please enter a url.")
+			return
+
+		shortenURL = words[1]
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"url\":\"" + shortenURL + "\"}}"
+		retCommand = "Net.Shorten"
 
 	elif words[0] == "weather":
 		if len(words) < 2:
@@ -257,17 +266,22 @@ def processCommand(cmd):
 				else:
 					print("Error in adding password.")
 
-			# Network response
-			elif retCommand == "Network.DNS":
+			# Net response
+			elif retCommand == "Net.DNS":
 				if 'response' in retData:
 					print(retData['response'])
 				else:
 					print("Error in host lookup.")
-			elif retCommand == "Network.Ping":
+			elif retCommand == "Net.Ping":
 				if 'response' in retData:
 					print(retData['response'])
 				else:
 					print("Error pinging host.")
+			elif retCommand == "Net.Shorten":
+				if 'url' in retData:
+					print(retData['url'])
+				else:
+					print("Error shorten URL.")
 
 			# Location response
 			elif retCommand == "Location.Weather":

@@ -127,8 +127,8 @@
 			}
 			break;
 
-		/* Network */
-		case "Network.Ping":
+		/* Net */
+		case "Net.Ping":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else if(($message = validate_parameters($params, array("host"))) !== "") {
@@ -139,7 +139,7 @@
 				$ret = alfred_result(0, array("reponse" => $output));
 			}
 			break;
-		case "Network.DNS":
+		case "Net.DNS":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else if(($message = validate_parameters($params, array("host"))) !== "") {
@@ -159,6 +159,15 @@
 				} else {
 					$ret = alfred_result(0, array("response" => "Unknown host."));
 				}
+			}
+			break;
+		case "Net.Shorten":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("url"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->url)));
 			}
 			break;
 
