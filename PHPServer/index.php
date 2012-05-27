@@ -167,7 +167,7 @@
 			} else if(($message = validate_parameters($params, array("host"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->data)))
+				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->data)));
 			}
 			break;
 
