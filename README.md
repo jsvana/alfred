@@ -154,6 +154,14 @@ Gives an LMGTFY URL from the given string.
 
 *Returns:* `url (string)`
 
+**Net.Twitter.LastTweet**
+
+Gets the most recent tweet of the given user.
+
+*Parameters:* `user`, the user whose tweet is fetched
+
+*Returns:* `tweet (string)`
+
 ### Password
 
 **Password.Add**
