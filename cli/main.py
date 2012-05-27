@@ -241,7 +241,6 @@ def processCommand(cmd):
 	req = urllib.request.Request(url, postData)
 	responseData = urllib.request.urlopen(req)
 	text = responseData.read()
-	print(text)
 	
 	retJson = json.loads(text.decode('utf-8'))
 

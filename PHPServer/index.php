@@ -189,7 +189,8 @@
 			} else {
 				$tweets = json_decode(file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" . url_encode($params->user) . "&count=1"));
 				$tweet = $tweets[0];
-				$ret = alfred_result(0, array("tweet" => json_encode($tweet)));
+
+				$ret = alfred_result(0, array("tweet" => $tweet->text));
 			}
 			break;
 
