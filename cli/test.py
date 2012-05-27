@@ -10,6 +10,10 @@ class Alfred(cmd.Cmd, object):
 	api = "0.1"
 	key = ""
 	intro = "Hello, Sir. How may I help?"
+	#doc_header = "What may I help you with today?"
+	#misc_header = ""
+	#undoc_header = ""
+	#ruler = ""
 	
 	def __init__(self):
 		super().__init__()
