@@ -131,6 +131,17 @@
 			break;
 
 		/* Net */
+		case "Net.Bitbucket.Status":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$rss = new SimpleXMLElement(file_get_contents("feeds.feedburner.com/BitbucketServerStatus?format=xml"));
+
+				$latestItem = $rss->channel->item[0];
+
+				$ret = alfred_result(0, array("time" => $latestItem->title, "description" => $latestItem->description));
+			}
+			break;
 		case "Net.Ping":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
