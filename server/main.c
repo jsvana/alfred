@@ -13,7 +13,7 @@
 // Include modules
 #include "alfred.h"
 #include "location.h"
-#include "network.h"
+#include "net.h"
 #include "password.h"
 #include "xbmc.h"
 
