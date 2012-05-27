@@ -5,11 +5,10 @@
 #include <json.h>
 #include <glib.h>
 
-// Lets me check the _ref_count
-#include <json_object_private.h>
-
 #include "json.h"
+#include "sql.h"
 #include "error.h"
+#include "utils.h"
 
 // Include modules
 #include "alfred.h"
@@ -59,18 +58,24 @@ int main(int argc, char *argv[]) {
 
 	char *method = alfred_json_get_string(json, "method");
 	char *alfred = alfred_json_get_string(json, "alfred");
+	char *key = alfred_json_get_string(json, "key");
 	json_object *params = json_object_object_get(json, "params");
 
-	if (!method || !alfred || !params) {
+	if (!method || !alfred || !key || !params) {
 		alfred_error_static(ALFRED_ERROR_MALFORMED_COMMAND);
 		g_free(method);
 		g_free(alfred);
+		g_free(key);
 		if (params) {
 			json_object_put(params);
 		}
 
 		return 0;
 	}
+
+	alfred_auth_set_key(key);
+
+	alfred_sql_init();
 
 	gchar **info = g_strsplit(method, ".", 2);
 
@@ -85,16 +90,26 @@ int main(int argc, char *argv[]) {
 			alfred_module_password(info[0], params);
 		} else if (strcmp(info[0], "XBMC") == 0) {
 			alfred_module_xbmc(info[0], params);
+		} else if (!alfred_authed()) {
+			alfred_error_static(ALFRED_ERROR_NOT_AUTHENTICATED);
 		} else {
 			alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 		}
+	} else if (!alfred_authed()) {
+		alfred_error_static(ALFRED_ERROR_NOT_AUTHENTICATED);
 	} else {
 		alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 	}
+
+	alfred_sql_shutdown();
+
+	// For good measure
+	alfred_auth_forget_key();
 	
 	g_strfreev(info);
 	g_free(method);
 	g_free(alfred);
+	g_free(key);
 
 	json_object_put(json);
 
