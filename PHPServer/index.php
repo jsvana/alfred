@@ -253,8 +253,6 @@
 				
 				$resultJSON = json_decode($result);
 
-				curl_close($ch);
-
 				$ret = alfred_result(0, array("message" => "Command sent.", "playerids" => json_encode($resultJSON->result)));
 			}
 			break;

@@ -1,8 +1,14 @@
 # Alfred
 
+Alfred is a server and collection of clients, each written for a different user in mind, that allows for easy and ready access to any and all services we could think of.  Want to get the weather in your town? Ask Alfred.  Need to check the number of players on your favorite Minecraft server? Ask Alfred.  You get the idea.
+
+We are lazy, so we came up with a wonderfully simple way to get the information we want in a simple format.  Data is transferred to and from Alfred via JSON, which makes it very easy to create a new interface for the server.
+
+The project is being actively developed, and new features and clients are being added all the time.  If you have any ideas for either, email the developers at jsvana@mtu.edu and kelwert@mtu.edu.
+
 ## Syntax
 
-Commands are sent to Alfred in the following format:
+Commands are sent in JSON to Alfred in the following format:
 
 	{
 		"alfred": "0.1",
