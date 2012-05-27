@@ -126,7 +126,7 @@ def processCommand(cmd):
 			return
 
 		shortenURL = words[1]
-		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"host\":\"" + shortenURL + "\"}}"
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"url\":\"" + shortenURL + "\"}}"
 		retCommand = "Net.Shorten"
 
 	elif words[0] == "weather":

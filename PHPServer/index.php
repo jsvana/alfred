@@ -164,10 +164,10 @@
 		case "Net.Shorten":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
-			} else if(($message = validate_parameters($params, array("host"))) !== "") {
+			} else if(($message = validate_parameters($params, array("url"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->data)));
+				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->url)));
 			}
 			break;
 
