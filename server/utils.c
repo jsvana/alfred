@@ -17,10 +17,14 @@ char *alfred_utils_md5(const char *data) {
 }
 
 char *alfred_utils_curl(const char *url) {
-	return alfred_utils_curl_post(url, NULL);
+	return alfred_utils_curl_post_login(url, NULL, NULL, NULL);
 }
 
 char *alfred_utils_curl_post(const char *url, const char *post_data) {
+	return alfred_utils_curl_post_login(url, post_data, NULL, NULL);
+}
+
+char *alfred_utils_curl_post_login(const char *url, const char *post_data, const char *username, const char *password) {
 	CURL *handle;
 	FILE *file;
 	char *data;
@@ -39,9 +43,19 @@ char *alfred_utils_curl_post(const char *url, const char *post_data) {
 	// Set a user-agent
 	curl_easy_setopt(handle, CURLOPT_USERAGENT, "alfred/libcurl/1.0");
 
+	//curl_easy_setopt(handle, CURLOPT_VERBOSE, TRUE);
+
 	// If we have data, use it
 	if (post_data) {
 		curl_easy_setopt(handle, CURLOPT_POSTFIELDS, post_data);
+	}
+
+	if (username) {
+		curl_easy_setopt(handle, CURLOPT_USERNAME, username);
+	}
+
+	if (password) {
+		curl_easy_setopt(handle, CURLOPT_PASSWORD, password);
 	}
 
 	// Here we go!
