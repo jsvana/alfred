@@ -4,3 +4,4 @@ alfred.rpc
 .DS_Store
 config.php
 config.h
+__pycache__
