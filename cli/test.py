@@ -104,6 +104,23 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a Bitbucket command.")
 
+	def complete_github(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['status'])
+
+	def help_github(self):
+		print("github status")
+
+	def do_github(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			if args[0] == "status":
+				(code, data) = self.request('Net.Github.Status')
+				if code >= 0: print("Status, as of " + data['data']['time'] + ": " + data['data']['description'])
+			else:
+				print("Unknown Github command.")
+		else:
+			print("Please specify a Github command.")
+
 	def help_time(self):
 		print('time')
 

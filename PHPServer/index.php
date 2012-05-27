@@ -142,6 +142,32 @@
 				$ret = alfred_result(0, array("time" => $latestItem->title, "description" => $latestItem->description));
 			}
 			break;
+		case "Net.Github.Status":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$json = json_decode(file_get_contents("https://status.github.com/status.json"));
+
+				switch($json->status) {
+					case "good":
+						$status = "All systems operational";
+						break;
+					case "minorproblem":
+						$status = "Minor problem"
+						break;
+					default:
+						$status = "Unknown";
+						break;
+				}
+
+				$date = $json->last_updated;
+
+				$ret = alfred_result(0, array("time" => $date, "description" => $status));
+			}
+			break;
+
+
+			https://status.github.com/status.json
 		case "Net.Ping":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
