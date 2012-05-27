@@ -153,7 +153,7 @@
 						$status = "All systems operational";
 						break;
 					case "minorproblem":
-						$status = "Minor problem"
+						$status = "Minor problem";
 						break;
 					default:
 						$status = "Unknown";
