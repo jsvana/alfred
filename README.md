@@ -146,6 +146,14 @@ Shortens a given URL.
 
 *Returns:* `url (string)`
 
+**Net.LMGTFY**
+
+Gives an LMGTFY URL from the given string.
+
+*Parameters:* `text`, the text to query
+
+*Returns:* `url (string)`
+
 ### Password
 
 **Password.Add**
@@ -170,14 +178,6 @@ Retrieves a password from the password manager.
 *Returns:* `password (string)`
 
 ### XBMC
-
-**XBMC.GetPlayer**
-
-Gets currently playing audio player.
-
-*Parameters:* `none`
-
-*Returns:* `playerID (string)`
 
 **XBMC.Pause**
 

@@ -173,10 +173,10 @@
 		case "Net.LMGTFY":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
-			} else if(($message = validate_parameters($params, array("string"))) !== "") {
+			} else if(($message = validate_parameters($params, array("text"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("url" => "http://lmgtfy.com/?=" . url_encode($params->string)));
+				$ret = alfred_result(0, array("url" => "http://lmgtfy.com/?=" . url_encode($params->text)));
 			}
 			break;
 
@@ -306,17 +306,6 @@
 				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Select\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
-			}
-			break;
-		case "XBMC.GetPlayer":
-			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
-				$ret = alfred_error(-3);
-			} else {
-				$result = xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.GetActivePlayers\", \"params\": { }, \"id\": 1}");
-				
-				$resultJSON = json_decode($result);
-
-				$ret = alfred_result(0, array("message" => "Command sent.", "playerids" => json_encode($resultJSON->result)));
 			}
 			break;
 
