@@ -285,7 +285,7 @@ def processCommand(cmd):
 						print("PlayerID: " + playerID)
 				else:
 					print("Error in retrieving playerID.")
-			elif retCommand == "XBMC.Pause" or retCommand == "XBMC.Mute" or retCommand == "XBMC.Unmute" or retCommand == "XBMC.Next" or retCommand == "XBMC.Previous" or retCommand == "XBMC.Volume" or retCommand == "XBMC.Shuffle":
+			elif retCommand == "XBMC.Pause" or retCommand == "XBMC.Mute" or retCommand == "XBMC.Unmute" or retCommand == "XBMC.Next" or retCommand == "XBMC.Previous" or retCommand == "XBMC.Volume" or retCommand == "XBMC.Shuffle" or retCommand == "XBMC.Up" or retCommand == "XBMC.Down" or retCommand == "XBMC.Left" or retCommand == "XBMC.Right" or retCommand == "XBMC.Select":
 				if 'message' in retData:
 					print(retData['message'])
 				else:

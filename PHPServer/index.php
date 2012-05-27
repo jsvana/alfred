@@ -249,7 +249,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Up\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Up\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -258,7 +258,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Down\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Down\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -267,7 +267,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Left\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Left\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -276,7 +276,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Right\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Right\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -285,7 +285,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Select\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Select\", \"params\": { }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
