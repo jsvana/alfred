@@ -1,6 +1,7 @@
 #include <glib.h>
 #include <json.h>
 #include <string.h>
+#include <stdio.h>
 #include "xbmc.h"
 #include "utils.h"
 #include "json.h"
