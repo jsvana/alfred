@@ -134,9 +134,9 @@ def processCommand(cmd):
 			print("Please enter a string to LMGTFY.")
 			return
 
-		string = words[1:].join(" ")
-		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"url\":\"" + string + "\"}}"
-		retCommand = "Net.Shorten"
+		text = " ".join(words[1:])
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.LMGTFY\",\"params\":{\"text\":\"" + text + "\"}}"
+		retCommand = "Net.LMGTFY"
 
 	elif words[0] == "weather":
 		if len(words) < 2:
@@ -290,7 +290,12 @@ def processCommand(cmd):
 				if 'url' in retData:
 					print(retData['url'])
 				else:
-					print("Error shorten URL.")
+					print("Error shortening URL.")
+			elif retCommand == "Net.LMGTFY":
+				if 'url' in retData:
+					print(retData['url'])
+				else:
+					print("Error getting LMGTFY URL.")
 
 			# Location response
 			elif retCommand == "Location.Weather":
