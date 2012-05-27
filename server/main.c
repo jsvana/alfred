@@ -87,9 +87,9 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(info[0], "Network") == 0) {
 			alfred_module_network(info[1], params);
 		} else if (strcmp(info[0], "Password") == 0) {
-			alfred_module_password(info[0], params);
+			alfred_module_password(info[1], params);
 		} else if (strcmp(info[0], "XBMC") == 0) {
-			alfred_module_xbmc(info[0], params);
+			alfred_module_xbmc(info[1], params);
 		} else if (!alfred_authed()) {
 			alfred_error_static(ALFRED_ERROR_NOT_AUTHENTICATED);
 		} else {
