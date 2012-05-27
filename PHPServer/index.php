@@ -245,6 +245,51 @@
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
 			break;
+		case "XBMC.Up":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Up\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Down":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Down\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Left":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Left\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Right":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Right\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
+		case "XBMC.Select":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Input.Select\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+
+				$ret = alfred_result(0, array("message" => "Command sent."));
+			}
+			break;
 		case "XBMC.GetPlayer":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);

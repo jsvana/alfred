@@ -170,6 +170,21 @@ def processCommand(cmd):
 		elif xbmcCommand == "shuffle":
 			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Shuffle\",\"params\":{}}"
 			retCommand = "XBMC.Shuffle"
+		elif xbmcCommand == "up":
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Up\",\"params\":{}}"
+			retCommand = "XBMC.Up"
+		elif xbmcCommand == "down":
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Down\",\"params\":{}}"
+			retCommand = "XBMC.Down"
+		elif xbmcCommand == "left":
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Left\",\"params\":{}}"
+			retCommand = "XBMC.Left"
+		elif xbmcCommand == "right":
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Right\",\"params\":{}}"
+			retCommand = "XBMC.Right"
+		elif xbmcCommand == "select":
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.Select\",\"params\":{}}"
+			retCommand = "XBMC.Select"
 		elif xbmcCommand == "player":
 			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"XBMC.GetPlayer\",\"params\":{}}"
 			retCommand = "XBMC.GetPlayer"

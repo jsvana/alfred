@@ -219,6 +219,46 @@ Unmutes XBMC.
 
 *Returns:* `none`
 
+**XBMC.Up**
+
+Moves XBMC selection up.
+
+*Parameters:* `none`
+
+*Returns:* `none`
+
+**XBMC.Down**
+
+Moves XBMC selection down.
+
+*Parameters:* `none`
+
+*Returns:* `none`
+
+**XBMC.Left**
+
+Moves XBMC selection left.
+
+*Parameters:* `none`
+
+*Returns:* `none`
+
+**XBMC.Right**
+
+Moves XBMC selection right.
+
+*Parameters:* `none`
+
+*Returns:* `none`
+
+**XBMC.Select**
+
+Makes XBMC selection.
+
+*Parameters:* `none`
+
+*Returns:* `none`
+
 **XBMC.Volume**
 
 Sets XBMC volume.
