@@ -39,6 +39,7 @@ class Alfred(cmd.Cmd, object):
 		# TODO: Make the urllib stuff safer
 		req = urllib.request.Request(self.url, data)
 		req_data = urllib.request.urlopen(req).read().decode('utf-8')
+		print(req_data)
 		req_data = json.loads(req_data)
 		if 'code' in req_data:
 			code = int(req_data['code'])
@@ -191,6 +192,20 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Twitter command.")
 		else:
 			print("Please specify a location.")
+
+	def help_ping(self):
+		print('ping <host>')
+
+	def do_ping(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			(code, data) = self.request('Net.Ping', {'host': args[0]})
+			if code >= 0:
+				print(data['data']['response'])
+			else:
+				print("Error pinging host.")
+		else:
+			print("Please specify a host.")
 
 	def help_login(self):
 		print('login <username> <password>')
