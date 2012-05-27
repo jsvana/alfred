@@ -36,7 +36,5 @@
 		}
 	}
 
-	fwrite($fp, $json[0]->namespace);
-
 	fclose($fp);
 ?>
