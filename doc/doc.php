@@ -1,10 +1,10 @@
 <?php
 	$template = file_get_contents('template.md');
-	$fp = fopen('test.md', 'w');
+	$fp = fopen('README.md', 'w');
 
 	fwrite($fp, $template);
 
-	$json = json_decode(file_get_contents("server_methods.json"));
+	$json = json_decode(file_get_contents("../server_methods.json"));
 
 	foreach($json as $namespace) {
 		fwrite($fp, "### " . $namespace->namespace . "\n\n");

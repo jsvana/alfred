@@ -84,7 +84,6 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 `-6` - `Internal server error`: something went wrong inside of Alfred  
 
 ## Commands
-
 ### Alfred
 
 **Alfred.Login**
