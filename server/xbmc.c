@@ -45,7 +45,11 @@ char *alfred_xbmc_request_new(const char *method, int player, json_object *param
 
 	alfred_xbmc_json_free(obj);
 
-	alfred_json_create_display(0, "Command sent.", NULL);
+
+	json_object *msg_params = json_object_new_object();
+	json_object *msg = json_object_new_string("Command sent.");
+	json_object_object_add(msg_params, "message", msg);
+	alfred_json_create_display(0, "Method success.", msg_params);
 
 	return data;
 }
@@ -66,6 +70,29 @@ void alfred_module_xbmc(const char *command, json_object *params) {
 			alfred_xbmc_request("Player.GoNext", 1, NULL);
 		} else if (strcmp(command, "Previous") == 0) {
 			alfred_xbmc_request("Player.GoPrevious", 1, NULL);
+		} else if (strcmp(command, "Shuffle") == 0) {
+			alfred_xbmc_request("Player.Shuffle", 1, NULL);
+		} else if (strcmp(command, "Mute") == 0) {
+			json_object *params = json_object_new_object();
+			json_object *mute = json_object_new_string("true");
+			json_object_object_add(params, "mute", mute);
+			alfred_xbmc_request("Application.SetMute", 0, params);
+		} else if (strcmp(command, "Unmute") == 0) {
+			json_object *params = json_object_new_object();
+			json_object *mute = json_object_new_string("false");
+			json_object_object_add(params, "mute", mute);
+			alfred_xbmc_request("Application.SetMute", 0, params);
+		} else if (strcmp(command, "Volume") == 0) {
+			char *volume = alfred_json_get_string(params, "volume");
+
+			if (volume) {
+				json_object *params = json_object_new_object();
+				json_object *vol = json_object_new_string("false");
+				json_object_object_add(params, "volume", vol);
+				alfred_xbmc_request("Application.SetVolume", 0, params);
+			} else {
+				alfred_error_static(ALFRED_ERROR_INCORRECT_PARAMS);
+			}
 		} else {
 			alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 		}
