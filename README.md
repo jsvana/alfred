@@ -157,7 +157,7 @@ Adds a password to the password manager.
 	`new`, the new password that is added  
 	`master`, the encryption key and identity verification
 
-*Returns:* nothing
+*Returns:* `message (string)`
 
 **Password.Retrieve**
 
