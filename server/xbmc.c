@@ -45,7 +45,6 @@ char *alfred_xbmc_request_new(const char *method, int player, json_object *param
 
 	alfred_xbmc_json_free(obj);
 
-
 	json_object *msg_params = json_object_new_object();
 	json_object *msg = json_object_new_string("Command sent.");
 	json_object_object_add(msg_params, "message", msg);
@@ -93,6 +92,16 @@ void alfred_module_xbmc(const char *command, json_object *params) {
 			} else {
 				alfred_error_static(ALFRED_ERROR_INCORRECT_PARAMS);
 			}
+		} else if (strcmp(command, "Up") == 0) {
+			alfred_xbmc_request("Input.Up", 0, params);
+		} else if (strcmp(command, "Down") == 0) {
+			alfred_xbmc_request("Input.Down", 0, params);
+		} else if (strcmp(command, "Left") == 0) {
+			alfred_xbmc_request("Input.Left", 0, params);
+		} else if (strcmp(command, "Right") == 0) {
+			alfred_xbmc_request("Input.Right", 0, params);
+		} else if (strcmp(command, "Select") == 0) {
+			alfred_xbmc_request("Input.Select", 0, params);
 		} else {
 			alfred_error_static(ALFRED_ERROR_UNKNOWN_COMMAND);
 		}
