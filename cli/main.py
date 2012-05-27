@@ -129,6 +129,15 @@ def processCommand(cmd):
 		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"url\":\"" + shortenURL + "\"}}"
 		retCommand = "Net.Shorten"
 
+	elif words[0] == "lmgtfy":
+		if len(words) < 2:
+			print("Please enter a string to LMGTFY.")
+			return
+
+		string = words[1:].join(" ")
+		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Shorten\",\"params\":{\"url\":\"" + string + "\"}}"
+		retCommand = "Net.Shorten"
+
 	elif words[0] == "weather":
 		if len(words) < 2:
 			print("Please enter a zip code.")

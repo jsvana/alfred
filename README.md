@@ -120,23 +120,31 @@ Gets the max player count of the given server.
 
 *Returns:* `maxPlayers (string)`
 
-### Network
+### Net
 
-**Network.Ping**
+**Net.Ping**
 
 Pings a host from the server.
 
 *Parameters:* `host`, the host to ping
 
-*Returns:* `output (string)`
+*Returns:* `response (string)`
 
-**Network.DNS**
+**Net.DNS**
 
 Looks up a host from the server.
 
 *Parameters:* `host`, the host to lookup
 
-*Returns:* `output (string)`
+*Returns:* `response (string)`
+
+**Net.Shorten**
+
+Shortens a given URL.
+
+*Parameters:* `url`, the URL to shorten
+
+*Returns:* `url (string)`
 
 ### Password
 
@@ -149,7 +157,7 @@ Adds a password to the password manager.
 	`new`, the new password that is added  
 	`master`, the encryption key and identity verification
 
-*Returns:* nothing
+*Returns:* `message (string)`
 
 **Password.Retrieve**
 
