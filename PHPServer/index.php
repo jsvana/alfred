@@ -180,6 +180,17 @@
 			}
 			break;
 
+		/* Net.Twitter */
+		case "Net.Twitter.LastTweet":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("user"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ret = alfred_result(0, array("tweet" => file_get_contents("https://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + $params->user + "&count=1")));
+			}
+			break;
+
 		/* Password */
 		case "Password.Retrieve":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {

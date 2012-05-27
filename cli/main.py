@@ -5,6 +5,10 @@ import json
 
 apiKey = ""
 
+ALFRED_HOST = "psg.mtu.edu"
+ALFRED_PORT = "21516"
+ALFRED_LOCATION = "/alfred/PHPServer/"
+
 def processCommand(cmd):
 	if len(cmd) == 0 or cmd == "quit":
 		return
@@ -138,6 +142,25 @@ def processCommand(cmd):
 		postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.LMGTFY\",\"params\":{\"text\":\"" + text + "\"}}"
 		retCommand = "Net.LMGTFY"
 
+	elif words[0] == "twitter":
+		if len(words) < 2:
+			print("Please enter a Twitter command.")
+			return
+
+		twitterCommand = words[1]
+
+		if twitterCommand == "last":
+			if len(words) < 3:
+				print("Please specify a user.")
+				return
+
+			user = words[2]
+			postData += "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"Net.Twitter.LastTweet\",\"params\":{\"user\":\"" + user + "\"}}"
+			retCommand = "Net.Twitter.LastTweet"
+		else:
+			print("Unknown Twitter command.")
+			return
+
 	elif words[0] == "weather":
 		if len(words) < 2:
 			print("Please enter a zip code.")
@@ -212,7 +235,8 @@ def processCommand(cmd):
 	else:
 		print("Unknown command.")
 
-	url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
+	url = "http://psg.mtu.edu:21516/alfred/alfred.rpc"
+	url = "http://" + ALFRED_HOST + ":" + ALFRED_PORT + ALFRED_LOCATION
 	postData = postData.encode('utf-8')
 	req = urllib.request.Request(url, postData)
 	responseData = urllib.request.urlopen(req)
@@ -296,6 +320,11 @@ def processCommand(cmd):
 					print(retData['url'])
 				else:
 					print("Error getting LMGTFY URL.")
+			elif retCommand == "Net.Twitter.LastTweet":
+				if 'tweet' in retData:
+					print(retData['tweet'])
+				else:
+					print("Error getting user's last tweet.")
 
 			# Location response
 			elif retCommand == "Location.Weather":
