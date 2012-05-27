@@ -292,10 +292,3 @@ while command != "quit":
 	command = input("> ")
 
 	processCommand(command)
-
-#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
-#data = "{\"alfred\":\"0.1\",\"key\":\"\",\"method\":\"Alfred.Login\",\"params\":{\"username\":\"jsvana\",\"password\":\"iorTk3QFcm\"}}"
-#data = data.encode('utf-8') # data should be bytes
-#req = urllib.request.Request(url, data)
-#response = urllib.request.urlopen(req)
-#print(response.read())
