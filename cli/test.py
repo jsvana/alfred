@@ -14,7 +14,7 @@ class Alfred(cmd.Cmd, object):
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
-	
+
 	def __init__(self):
 		super().__init__()
 
@@ -87,6 +87,23 @@ class Alfred(cmd.Cmd, object):
 			# What? I was lazy
 			print("Please specify a server.")
 
+	def complete_bitbucket(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['status'])
+
+	def help_bitbucket(self):
+		print("bitbucket status")
+
+	def do_bitbucket(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			if args[0] == "status":
+				(code, data) = self.request('Net.Bitbucket.Status')
+				if code >= 0: print("Status, as of " + data['data']['time'] + ": " + data['data']['description'])
+			else:
+				print("Unknown Bitbucket command.")
+		else:
+			print("Please specify a Bitbucket command.")
+
 	def help_time(self):
 		print('time')
 
@@ -141,6 +158,6 @@ class Alfred(cmd.Cmd, object):
 			print("Login successful.")
 		else:
 			print("Error in logging in.")
-		
+
 if __name__ == '__main__':
 	Alfred().cmdloop()

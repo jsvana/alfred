@@ -135,7 +135,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				$rss = new SimpleXMLElement(file_get_contents("feeds.feedburner.com/BitbucketServerStatus?format=xml"));
+				$rss = new SimpleXMLElement(file_get_contents("http://feeds.feedburner.com/BitbucketServerStatus"));
 
 				$latestItem = $rss->channel->item[0];
 
