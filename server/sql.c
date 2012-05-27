@@ -4,6 +4,7 @@
 #include <glib.h>
 
 #include "sql.h"
+#include "config.h"
 
 MYSQL *sql = NULL;
 

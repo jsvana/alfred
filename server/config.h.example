@@ -1,0 +1,15 @@
+#ifndef ALFRED_CONFIG
+#define ALFRED_CONFIG
+
+#define XBMC_USER "xbmc"
+#define XBMC_PASS "password"
+#define XBMC_HOST "localhost"
+#define XBMC_PORT "8080"
+
+#define ALFRED_SQL_USER "alfred"
+#define ALFRED_SQL_PASS "pass"
+#define ALFRED_SQL_HOST "localhost"
+#define ALFRED_SQL_PORT 3306
+#define ALFRED_SQL_DB   "alfred"
+
+#endif

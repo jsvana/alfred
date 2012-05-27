@@ -5,11 +5,7 @@
 #include "utils.h"
 #include "json.h"
 #include "error.h"
-
-#define XBMC_USER "xbmc"
-#define XBMC_PASS "1123581321!"
-#define XBMC_HOST "garkin.dyndns.org"
-#define XBMC_PORT "8080"
+#include "config.h"
 
 json_object *alfred_xbmc_json_new(const char *method, int player, json_object *params) {
 	json_object *obj = json_object_new_object();
