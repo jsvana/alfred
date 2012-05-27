@@ -43,6 +43,8 @@ char *alfred_xbmc_request_new(const char *method, int player, json_object *param
 
 	char *data = alfred_utils_curl_post_login("http://" XBMC_HOST ":" XBMC_PORT "/jsonrpc", json_object_to_json_string(obj), XBMC_USER, XBMC_PASS);
 
+	printf("%s\n", data);
+
 	alfred_xbmc_json_free(obj);
 
 	json_object *msg_params = json_object_new_object();
@@ -73,20 +75,21 @@ void alfred_module_xbmc(const char *command, json_object *params) {
 			alfred_xbmc_request("Player.Shuffle", 1, NULL);
 		} else if (strcmp(command, "Mute") == 0) {
 			json_object *params = json_object_new_object();
-			json_object *mute = json_object_new_string("true");
+			json_object *mute = json_object_new_boolean(TRUE);
 			json_object_object_add(params, "mute", mute);
 			alfred_xbmc_request("Application.SetMute", 0, params);
 		} else if (strcmp(command, "Unmute") == 0) {
 			json_object *params = json_object_new_object();
-			json_object *mute = json_object_new_string("false");
+			json_object *mute = json_object_new_boolean(FALSE);
 			json_object_object_add(params, "mute", mute);
 			alfred_xbmc_request("Application.SetMute", 0, params);
 		} else if (strcmp(command, "Volume") == 0) {
+			// TODO: Do this right
 			char *volume = alfred_json_get_string(params, "volume");
 
 			if (volume) {
 				json_object *params = json_object_new_object();
-				json_object *vol = json_object_new_string("false");
+				json_object *vol = json_object_new_int(atoi(volume));
 				json_object_object_add(params, "volume", vol);
 				alfred_xbmc_request("Application.SetVolume", 0, params);
 			} else {
