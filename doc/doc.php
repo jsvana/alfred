@@ -10,8 +10,9 @@
 		fwrite($fp, "### " . $namespace->namespace . "\n\n");
 
 		foreach($namespace->methods as $method) {
-			$methodName = substr($method->method, count($namespace->namespace) + 2);
-			fwrite($fp, "**" . $namespace->namespace . "**.***" $methodName . "***\n\n");
+			$index = lastIndexOf($method->method, ".");
+			$methodName = substr($method->method, $index + 1);
+			fwrite($fp, "**" . $namespace->namespace . "**.***" . $methodName . "***\n\n");
 			fwrite($fp, $method->description . "\n\n");
 
 			if(count($method->parameters) == 0) {
@@ -41,4 +42,14 @@
 	}
 
 	fclose($fp);
+
+	function lastIndexOf($string, $item){
+		$index = strpos(strrev($string),strrev($item));
+		if($index) {
+			$index = strlen($string) - strlen($item) - $index;
+			return $index;
+		} else {
+			return -1;
+		}
+	}
 ?>

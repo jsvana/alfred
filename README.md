@@ -87,7 +87,7 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 ### Alfred
 
-**Alfred.Login**
+**Alfred**.***Login***
 
 Initiates session with the server.
 
@@ -98,7 +98,7 @@ Initiates session with the server.
 *Returns:*  
 `key (string)`, the API key for the user  
 
-**Alfred.Time**
+**Alfred**.***Time***
 
 Gets the server time.
 
@@ -109,7 +109,7 @@ Gets the server time.
 
 ### Location
 
-**Location.Weather**
+**Location**.***Weather***
 
 Fetches current weather for a given zip code.
 
@@ -124,7 +124,7 @@ Fetches current weather for a given zip code.
 
 ### Minecraft
 
-**Minecraft.MOTD**
+**Minecraft**.***MOTD***
 
 Gets the MOTD of the given server.
 
@@ -134,7 +134,7 @@ Gets the MOTD of the given server.
 *Returns:*  
 `motd (string)`, the message of the day of the Minecraft server  
 
-**Minecraft.Players**
+**Minecraft**.***Players***
 
 Gets the current player count of the given server.
 
@@ -144,7 +144,7 @@ Gets the current player count of the given server.
 *Returns:*  
 `players (string)`, the number of players on the Minecraft server  
 
-**Minecraft.MaxPlayers**
+**Minecraft**.***MaxPlayers***
 
 Gets the max player count of the given server.
 
@@ -156,27 +156,7 @@ Gets the max player count of the given server.
 
 ### Net
 
-**Net.Bitbucket.Status**
-
-Gets Bitbucket's status.
-
-*Parameters:* `none`
-
-*Returns:*  
-`time (string)`, the time of the latest update  
-`description (string)`, the latest status description  
-
-**Net.Github.Status**
-
-Gets Github's status.
-
-*Parameters:* `none`
-
-*Returns:*  
-`time (string)`, the time of the latest update  
-`description (string)`, the latest status description  
-
-**Net.Ping**
+**Net**.***Ping***
 
 Pings a host from the server.
 
@@ -186,7 +166,7 @@ Pings a host from the server.
 *Returns:*  
 `response (string)`, the ping response from the host  
 
-**Net.DNS**
+**Net**.***DNS***
 
 Looks up a host from the server.
 
@@ -196,7 +176,7 @@ Looks up a host from the server.
 *Returns:*  
 `response (string)`, the DNS lookup results for the host  
 
-**Net.Shorten**
+**Net**.***Shorten***
 
 Shortens a given URL.
 
@@ -206,7 +186,7 @@ Shortens a given URL.
 *Returns:*  
 `url (string)`, the shortened URL  
 
-**Net.LMGTFY**
+**Net**.***LMGTFY***
 
 Gives an LMGTFY URL from the given string.
 
@@ -216,7 +196,33 @@ Gives an LMGTFY URL from the given string.
 *Returns:*  
 `url (string)`, the query URL  
 
-**Net.Twitter.LastTweet**
+### Net.Bitbucket
+
+**Net.Bitbucket**.***Status***
+
+Gets Bitbucket's status.
+
+*Parameters:* `none`
+
+*Returns:*  
+`time (string)`, the time of the latest update  
+`description (string)`, the latest status description  
+
+### Net.Github
+
+**Net.Github**.***Status***
+
+Gets Github's status.
+
+*Parameters:* `none`
+
+*Returns:*  
+`time (string)`, the time of the latest update  
+`description (string)`, the latest status description  
+
+### Net.Twitter
+
+**Net.Twitter**.***LastTweet***
 
 Gets the most recent tweet of the given user.
 
@@ -228,7 +234,7 @@ Gets the most recent tweet of the given user.
 
 ### Password
 
-**Password.Add**
+**Password**.***Add***
 
 Adds a password to the password manager.
 
@@ -241,7 +247,7 @@ Adds a password to the password manager.
 *Returns:*  
 `message (string)`, the status of the password insertion  
 
-**Password.Retrieve**
+**Password**.***Retrieve***
 
 Retrieves a password from the password manager.
 
@@ -255,7 +261,7 @@ Retrieves a password from the password manager.
 
 ### XBMC
 
-**XBMC.Pause**
+**XBMC**.***Pause***
 
 Pauses current stream.
 
@@ -264,7 +270,7 @@ Pauses current stream.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Next**
+**XBMC**.***Next***
 
 Skips to next song in queue.
 
@@ -273,7 +279,7 @@ Skips to next song in queue.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Previous**
+**XBMC**.***Previous***
 
 Skips to previous song in queue.
 
@@ -282,7 +288,7 @@ Skips to previous song in queue.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Shuffle**
+**XBMC**.***Shuffle***
 
 Shuffles Now Playing queue.
 
@@ -291,7 +297,7 @@ Shuffles Now Playing queue.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Mute**
+**XBMC**.***Mute***
 
 Mutes XBMC.
 
@@ -300,7 +306,7 @@ Mutes XBMC.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Unmute**
+**XBMC**.***Unmute***
 
 Unmutes XBMC.
 
@@ -309,7 +315,7 @@ Unmutes XBMC.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Up**
+**XBMC**.***Up***
 
 Moves XBMC selection up.
 
@@ -318,7 +324,7 @@ Moves XBMC selection up.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Down**
+**XBMC**.***Down***
 
 Moves XBMC selection down.
 
@@ -327,7 +333,7 @@ Moves XBMC selection down.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Left**
+**XBMC**.***Left***
 
 Moves XBMC selection left.
 
@@ -336,7 +342,7 @@ Moves XBMC selection left.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Right**
+**XBMC**.***Right***
 
 Moves XBMC selection right.
 
@@ -345,7 +351,7 @@ Moves XBMC selection right.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Select**
+**XBMC**.***Select***
 
 Makes XBMC selection.
 
@@ -354,7 +360,7 @@ Makes XBMC selection.
 *Returns:*  
 `message (string)`, the result of the command.  
 
-**XBMC.Volume**
+**XBMC**.***Volume***
 
 Sets XBMC volume.
 
