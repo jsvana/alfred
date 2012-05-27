@@ -140,40 +140,6 @@
 		"namespace" : "Net",
 		"methods" : [
 			{
-				"method" : "Net.Bitbucket.Status",
-				"description" : "Gets Bitbucket's status.",
-				"parameters" : [ ],
-				"returns" : [
-					{
-						"name" : "time",
-						"description" : "the time of the latest update",
-						"type" : "string"
-					},
-					{
-						"name" : "description",
-						"description" : "the latest status description",
-						"type" : "string"
-					}
-				]
-			},
-			{
-				"method" : "Net.Github.Status",
-				"description" : "Gets Github's status.",
-				"parameters" : [ ],
-				"returns" : [
-					{
-						"name" : "time",
-						"description" : "the time of the latest update",
-						"type" : "string"
-					},
-					{
-						"name" : "description",
-						"description" : "the latest status description",
-						"type" : "string"
-					}
-				]
-			},
-			{
 				"method" : "Net.Ping",
 				"description" : "Pings a host from the server.",
 				"parameters" : [
@@ -244,7 +210,56 @@
 						"type" : "string"
 					}
 				]
-			},
+			}
+		]
+	},
+	{
+		"namespace" : "Net.Bitbucket",
+		"methods" : [
+			{
+				"method" : "Net.Bitbucket.Status",
+				"description" : "Gets Bitbucket's status.",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "time",
+						"description" : "the time of the latest update",
+						"type" : "string"
+					},
+					{
+						"name" : "description",
+						"description" : "the latest status description",
+						"type" : "string"
+					}
+				]
+			}
+		]
+	},
+	{
+		"namespace" : "Net.Github",
+		"methods" : [
+			{
+				"method" : "Net.Github.Status",
+				"description" : "Gets Github's status.",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "time",
+						"description" : "the time of the latest update",
+						"type" : "string"
+					},
+					{
+						"name" : "description",
+						"description" : "the latest status description",
+						"type" : "string"
+					}
+				]
+			}
+		]
+	},
+	{
+		"namespace" : "Net.Twitter",
+		"methods" : [
 			{
 				"method" : "Net.Twitter.LastTweet",
 				"description" : "Gets the most recent tweet of the given user.",
