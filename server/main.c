@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
 			alfred_module_alfred(info[1], params);
 		} else if (strcmp(info[0], "Location") == 0) {
 			alfred_module_location(info[1], params);
-		} else if (strcmp(info[0], "Network") == 0) {
-			alfred_module_network(info[1], params);
+		} else if (strcmp(info[0], "Net") == 0) {
+			alfred_module_net(info[1], params);
 		} else if (strcmp(info[0], "Password") == 0) {
 			alfred_module_password(info[1], params);
 		} else if (strcmp(info[0], "XBMC") == 0) {
