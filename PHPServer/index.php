@@ -170,6 +170,15 @@
 				$ret = alfred_result(0, array("url" => file_get_contents("http://is.gd/create.php?format=simple&url=" . $params->url)));
 			}
 			break;
+		case "Net.LMGTFY":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("string"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ret = alfred_result(0, array("url" => "http://lmgtfy.com/?=" . url_encode($params->string)));
+			}
+			break;
 
 		/* Password */
 		case "Password.Retrieve":
@@ -447,6 +456,12 @@
 			'motd'        =>        $d[0],
 			'players'     => intval($d[1]),
 			'maxPlayers' => intval($d[2]));
+	}
+
+	function url_encode($string) {
+	    $entities = array('%21', '%2A', '%27', '%28', '%29', '%3B', '%3A', '%40', '%26', '%3D', '%2B', '%24', '%2C', '%2F', '%3F', '%25', '%23', '%5B', '%5D');
+	    $replacements = array('!', '*', "'", "(", ")", ";", ":", "@", "&", "=", "+", "$", ",", "/", "?", "%", "#", "[", "]");
+	    return str_replace($entities, $replacements, urlencode($string));
 	}
 
 	function xbmc_request($data) {
