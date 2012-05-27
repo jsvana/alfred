@@ -187,7 +187,7 @@
 			} else if(($message = validate_parameters($params, array("user"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("tweet" => file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + url_encode($params->user) + "&count=1")));
+				$ret = alfred_result(0, array("tweet" => file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" . url_encode($params->user) . "&count=1")));
 			}
 			break;
 
