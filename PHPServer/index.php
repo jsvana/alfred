@@ -227,6 +227,13 @@
 			}
 			break;
 
+		/* System */
+		case "System.Introspect":
+		case "System.Lock":
+		case "System.Unlock":
+			$ret = alfred_error(-2);
+			break;
+
 		/* XBMC */
 		case "XBMC.Pause":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
