@@ -91,11 +91,11 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 Initiates session with the server.
 
-*Parameters:*
+*Parameters:*  
 `username (string)`, the username for the user  
 `password (string)`, the password for the user  
 
-*Returns:*
+*Returns:*  
 `key (string)`, the API key for the user  
 
 **Alfred.Time**
@@ -104,7 +104,7 @@ Gets the server time.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `time (string)`, Alfred's system time, in the format YYYY-mm-dd hh:mm:ss GMT-hh:mm  
 
 ### Location
@@ -113,10 +113,10 @@ Gets the server time.
 
 Fetches current weather for a given zip code.
 
-*Parameters:*
+*Parameters:*  
 `zip (string)`, the zip code for the area  
 
-*Returns:*
+*Returns:*  
 `location (string)`, the city and state for the conditions  
 `text (string)`, a description of the conditions  
 `temp (string)`, the current temperature (in Celcius)  
@@ -128,30 +128,30 @@ Fetches current weather for a given zip code.
 
 Gets the MOTD of the given server.
 
-*Parameters:*
+*Parameters:*  
 `server (string)`, the Minecraft server to access  
 
-*Returns:*
+*Returns:*  
 `motd (string)`, the message of the day of the Minecraft server  
 
 **Minecraft.Players**
 
 Gets the current player count of the given server.
 
-*Parameters:*
+*Parameters:*  
 `server (string)`, the Minecraft server to access  
 
-*Returns:*
+*Returns:*  
 `players (string)`, the number of players on the Minecraft server  
 
 **Minecraft.MaxPlayers**
 
 Gets the max player count of the given server.
 
-*Parameters:*
+*Parameters:*  
 `server (string)`, the Minecraft server to access  
 
-*Returns:*
+*Returns:*  
 `maxPlayers (string)`, the maximum number of players allowed on the Minecraft server  
 
 ### Net
@@ -162,7 +162,7 @@ Gets Bitbucket's status.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `time (string)`, the time of the latest update  
 `description (string)`, the latest status description  
 
@@ -172,7 +172,7 @@ Gets Github's status.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `time (string)`, the time of the latest update  
 `description (string)`, the latest status description  
 
@@ -180,50 +180,50 @@ Gets Github's status.
 
 Pings a host from the server.
 
-*Parameters:*
+*Parameters:*  
 `host (string)`, the host to ping  
 
-*Returns:*
+*Returns:*  
 `response (string)`, the ping response from the host  
 
 **Net.DNS**
 
 Looks up a host from the server.
 
-*Parameters:*
+*Parameters:*  
 `host (string)`, the host to lookup  
 
-*Returns:*
+*Returns:*  
 `response (string)`, the DNS lookup results for the host  
 
 **Net.Shorten**
 
 Shortens a given URL.
 
-*Parameters:*
+*Parameters:*  
 `url (string)`, the URL to shorten  
 
-*Returns:*
+*Returns:*  
 `url (string)`, the shortened URL  
 
 **Net.LMGTFY**
 
 Gives an LMGTFY URL from the given string.
 
-*Parameters:*
+*Parameters:*  
 `text (string)`, the text to be included in the URL  
 
-*Returns:*
+*Returns:*  
 `url (string)`, the query URL  
 
 **Net.Twitter.LastTweet**
 
 Gets the most recent tweet of the given user.
 
-*Parameters:*
+*Parameters:*  
 `user (string)`, the user whose tweet is fetched  
 
-*Returns:*
+*Returns:*  
 `tweet (string)`, the user's most recent tweet  
 
 ### Password
@@ -232,25 +232,25 @@ Gets the most recent tweet of the given user.
 
 Adds a password to the password manager.
 
-*Parameters:*
+*Parameters:*  
 `site (string)`, the site for which the password is retrieved  
 `user (string)`, the user of the password  
 `new (string)`, the new password that is added  
 `master (string)`, the encryption key and identity verification  
 
-*Returns:*
+*Returns:*  
 `message (string)`, the status of the password insertion  
 
 **Password.Retrieve**
 
 Retrieves a password from the password manager.
 
-*Parameters:*
+*Parameters:*  
 `site (string)`, the site for which the password is retrieved  
 `user (string)`, the user of the password  
 `master (string)`, the encryption key and identity verification  
 
-*Returns:*
+*Returns:*  
 `password (string)`, the retrieved password  
 
 ### XBMC
@@ -261,7 +261,7 @@ Pauses current stream.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Next**
@@ -270,7 +270,7 @@ Skips to next song in queue.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Previous**
@@ -279,7 +279,7 @@ Skips to previous song in queue.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Shuffle**
@@ -288,7 +288,7 @@ Shuffles Now Playing queue.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Mute**
@@ -297,7 +297,7 @@ Mutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Unmute**
@@ -306,7 +306,7 @@ Unmutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Up**
@@ -315,7 +315,7 @@ Moves XBMC selection up.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Down**
@@ -324,7 +324,7 @@ Moves XBMC selection down.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Left**
@@ -333,7 +333,7 @@ Moves XBMC selection left.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Right**
@@ -342,7 +342,7 @@ Moves XBMC selection right.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Select**
@@ -351,16 +351,16 @@ Makes XBMC selection.
 
 *Parameters:* `none`
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
 **XBMC.Volume**
 
 Sets XBMC volume.
 
-*Parameters:*
+*Parameters:*  
 `volume (string)`, the player's new volume  
 
-*Returns:*
+*Returns:*  
 `message (string)`, the result of the command.  
 
