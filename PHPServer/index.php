@@ -176,7 +176,9 @@
 			} else {
 				$output = shell_exec("ping -c 1 " . $params->host);
 
-				$ret = alfred_result(0, array("reponse" => explode("\n", $output)[0]);
+				$results = explode("\n", $output);
+
+				$ret = alfred_result(0, array("response" => $results[0]));
 			}
 			break;
 		case "Net.DNS":
