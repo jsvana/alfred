@@ -178,7 +178,7 @@
 
 				$results = explode("\n", $output);
 
-				$ret = alfred_result(0, array("response" => $results[0]));
+				$ret = alfred_result(0, array("response" => $results[1]));
 			}
 			break;
 		case "Net.DNS":
