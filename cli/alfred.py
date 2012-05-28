@@ -11,6 +11,8 @@ class Alfred(cmd.Cmd, object):
 	key = ""
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
+
+	debug = False
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
@@ -35,11 +37,11 @@ class Alfred(cmd.Cmd, object):
 
 	def request(self, method, params = {}):
 		data = json.dumps({'alfred': self.api, 'key': self.key, 'method': method, 'params': params}).encode('utf-8')
-		print(data)
+		if self.debug: print(data)
 		# TODO: Make the urllib stuff safer
 		req = urllib.request.Request(self.url, data)
 		req_data = urllib.request.urlopen(req).read().decode('utf-8')
-		print(req_data)
+		if self.debug: print(req_data)
 		req_data = json.loads(req_data)
 		if 'code' in req_data:
 			code = int(req_data['code'])
@@ -204,6 +206,20 @@ class Alfred(cmd.Cmd, object):
 				print(data['data']['response'])
 			else:
 				print("Error pinging host.")
+		else:
+			print("Please specify a host.")
+
+	def help_dns(self):
+		print('ping <host>')
+
+	def do_dns(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			(code, data) = self.request('Net.DNS', {'host': args[0]})
+			if code >= 0:
+				print(data['data']['response'])
+			else:
+				print("Error in host lookup.")
 		else:
 			print("Please specify a host.")
 

@@ -197,7 +197,7 @@
 					$line = $arr[$res + 1];
 					$tokens = explode("\t", $line);
 
-					$ret = alfred_result(0, array("response" => $tokens[0] . " " . $tokens[count(tokens) - 1]));
+					$ret = alfred_result(0, array("response" => $tokens[0] . " " . $tokens[count($tokens) - 1]));
 				} else {
 					$ret = alfred_result(0, array("response" => "Unknown host."));
 				}
