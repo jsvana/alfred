@@ -186,10 +186,10 @@ class Alfred(cmd.Cmd, object):
 			print("Unknown password command.")
 
 	def complete_twitter(self, text, line, begidx, endidx):
-		return self.generic_complete(text, ['last'])
+		return self.generic_complete(text, ['last', 'tweets'])
 
 	def help_twitter(self):
-		print('twitter last <user>')
+		print('twitter tweets|last <user>')
 
 	def do_twitter(self, s):
 		args = shlex.split(s)
@@ -201,6 +201,13 @@ class Alfred(cmd.Cmd, object):
 				(code, data) = self.request('Net.Twitter.LastTweet', {'user': args[1]})
 				if code >= 0:
 					print(data['data']['tweet'])
+			elif args[0] == "tweets":
+				if len(args) < 2:
+					print("Please specify a user.")
+					return
+				(code, data) = self.request('Net.Twitter.Tweets', {'user': args[1]})
+				if code >= 0:
+					print(", ".join(map(lambda t: t['text'], data['data']['tweets'])))
 			else:
 				print("Unknown Twitter command.")
 		else:

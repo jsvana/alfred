@@ -295,6 +295,17 @@
 				$ret = alfred_result(0, array("tweet" => $tweet->text));
 			}
 			break;
+		case "Net.Twitter.Tweets":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("user"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$tweets = file_get_contents("http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" . url_encode($params->user)));
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"tweets\":" . $tweets . "}}";
+			}
+			break;
 
 		/* Password */
 		case "Password.Retrieve":
