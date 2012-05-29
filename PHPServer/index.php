@@ -179,6 +179,18 @@
 			break;
 
 		/* Net */
+		case "Net.Bitbucket.Followers":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("user"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$url = "https://api.bitbucket.org/1.0/users/" . url_encode($params->user) . "/followers/";
+				$json = json_decode(file_get_contents($url));
+				
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"followers\":" . json_encode($json->followers) . "}}";
+			}
+			break;
 		case "Net.Bitbucket.Status":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);

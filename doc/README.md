@@ -228,6 +228,16 @@ Gives an LMGTFY URL from the given string.
 
 ### Net.Bitbucket
 
+**Net.Bitbucket**.***Followers***
+
+Gets the followers of the given Bitbucket user.
+
+*Parameters:*  
+`user (string)`, the user to search  
+
+*Returns:*  
+`followers (json)`, a JSON array of the followers  
+
 **Net.Bitbucket**.***Status***
 
 Gets Bitbucket's status.

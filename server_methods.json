@@ -271,6 +271,24 @@
 		"namespace" : "Net.Bitbucket",
 		"methods" : [
 			{
+				"method" : "Net.Bitbucket.Followers",
+				"description" : "Gets the followers of the given Bitbucket user.",
+				"parameters" : [
+					{
+						"name" : "user",
+						"description" : "the user to search",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "followers",
+						"description" : "a JSON array of the followers",
+						"type" : "json"
+					}
+				]
+			},
+			{
 				"method" : "Net.Bitbucket.Status",
 				"description" : "Gets Bitbucket's status.",
 				"parameters" : [ ],

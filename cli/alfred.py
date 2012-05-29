@@ -41,7 +41,7 @@ class Alfred(cmd.Cmd, object):
 		# TODO: Make the urllib stuff safer
 		req = urllib.request.Request(self.url, data)
 		req_data = urllib.request.urlopen(req).read().decode('utf-8')
-		if self.debug: print(req_data)
+		if self.debug: print("Response: " + req_data)
 		req_data = json.loads(req_data)
 		if 'code' in req_data:
 			code = int(req_data['code'])
@@ -91,17 +91,24 @@ class Alfred(cmd.Cmd, object):
 			print("Please specify a server.")
 
 	def complete_bitbucket(self, text, line, begidx, endidx):
-		return self.generic_complete(text, ['status'])
+		return self.generic_complete(text, ['status', 'following'])
 
 	def help_bitbucket(self):
 		print("bitbucket status")
 
 	def do_bitbucket(self, s):
 		args = shlex.split(s)
-		if len(args) == 1:
+		if len(args) >= 1:
 			if args[0] == "status":
 				(code, data) = self.request('Net.Bitbucket.Status')
 				if code >= 0: print("Status, as of " + data['data']['time'] + ": " + data['data']['description'])
+			elif args[0] == "following":
+				if len(args) != 2:
+					print("Please specify a user.")
+				else:
+					(code, data) = self.request('Net.Bitbucket.Followers', {'user': args[1]})
+					if code >= 0:
+						print(", ".join(map(lambda u: u['username'], data['data']['followers'])))
 			else:
 				print("Unknown Bitbucket command.")
 		else:
