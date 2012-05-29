@@ -38,7 +38,12 @@
 			}
 			break;
 		case "Alfred.Logout":
-			$ret = alfred_error(-2);
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				mysql_query("DELETE FROM `sessions` WHERE api_key='" . mysql_real_escape_string($data->key) . "';");
+				$ret = alfred_result(0, array("message" => "Logout successful."));
+			}
 			break;
 		case "Alfred.Time":
 			$ret = alfred_result(0, array("time" => date("Y-m-d H:i:s \G\M\TP")));
@@ -74,6 +79,49 @@
 				}
 
 				$ret = alfred_result(0, array("location" => $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'], "text" => $yw_forecast['condition']['text'], "temp" => $yw_forecast['condition']['temp'], "date" => $yw_forecast['condition']['date']));
+			}
+			break;
+		case "Location.Zip":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("city"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$url = "http://where.yahooapis.com/geocode?appid=" . $YAHOO_APPID . "&flags=JQR&q=" . url_encode($params->city);
+				$data = file_get_contents($url);
+				$json = json_decode($data);
+
+				$result = $json->ResultSet->Results[0];
+
+				$ret = alfred_result(0, array("zip" => $result->uzip));
+			}
+			break;
+		case "Location.AreaCode":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("city"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$data = file_get_contents("http://where.yahooapis.com/geocode?appid=" . $YAHOO_APPID . "&flags=JQR&q=" . url_encode($params->city));
+				$json = json_decode($data);
+
+				$result = $json->ResultSet->Results[0];
+
+				$ret = alfred_result(0, array("areacode" => $result->areacode));
+			}
+			break;
+		case "Location.NearestAirport":
+			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("city"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$data = file_get_contents("http://where.yahooapis.com/geocode?appid=" . $YAHOO_APPID . "&flags=JQR&q=" . url_encode($params->city));
+				$json = json_decode($data);
+
+				$result = $json->ResultSet->Results[0];
+
+				$ret = alfred_result(0, array("airport" => $result->airport));
 			}
 			break;
 

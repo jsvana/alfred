@@ -74,6 +74,60 @@
 						"type" : "string"
 					}
 				]
+			},
+			{
+				"method" : "Location.Zip",
+				"description" : "Fetches Zip Code of the given city.",
+				"parameters" : [
+					{
+						"name" : "city",
+						"description" : "the name of the city in the zip code",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "zip",
+						"description" : "the zip code of the city",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "Location.AreaCode",
+				"description" : "Fetches the area code of the given city.",
+				"parameters" : [
+					{
+						"name" : "city",
+						"description" : "the name of the city in the area code",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "areacode",
+						"description" : "the area code of the city",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "Location.NearestAirport",
+				"description" : "Fetches the closest airport to the given city.",
+				"parameters" : [
+					{
+						"name" : "city",
+						"description" : "the name of the city to query",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "airport",
+						"description" : "the closest airport to the city",
+						"type" : "string"
+					}
+				]
 			}
 		]
 	},

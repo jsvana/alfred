@@ -122,6 +122,36 @@ Fetches current weather for a given zip code.
 `temp (string)`, the current temperature (in Celcius)  
 `date (string)`, the date of the conditions  
 
+**Location**.***Zip***
+
+Fetches Zip Code of the given city.
+
+*Parameters:*  
+`city (string)`, the name of the city in the zip code  
+
+*Returns:*  
+`zip (string)`, the zip code of the city  
+
+**Location**.***AreaCode***
+
+Fetches the area code of the given city.
+
+*Parameters:*  
+`city (string)`, the name of the city in the area code  
+
+*Returns:*  
+`areacode (string)`, the area code of the city  
+
+**Location**.***NearestAirport***
+
+Fetches the closest airport to the given city.
+
+*Parameters:*  
+`city (string)`, the name of the city to query  
+
+*Returns:*  
+`airport (string)`, the closest airport to the city  
+
 ### Minecraft
 
 **Minecraft**.***MOTD***

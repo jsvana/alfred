@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Alfred Test</title>
+		
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script>
+			var apiKey = "";
+
+			$(function() {
+				$('#submit').on('click', function() {
+					var query = "";
+
+					switch($('#method').val()) {
+						case "Alfred.Login":
+							query = '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}';
+							break;
+						case "Alfred.Time":
+							query = '{"alfred":"0.1","key":"' + apiKey + '","method":"Alfred.Time","params":{}}';
+							break;
+						case "Location.Weather":
+							query = '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{"zip":"49931"}}';
+							break;
+						case "Minecraft.MOTD":
+							query = '{"alfred":"0.1","key":"' + apiKey + '","method":"Minecraft.MOTD","params":{"server":"keepcraft.in"}}';
+							break;
+						case "Net.Ping":
+							query = '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Ping","params":{"host":"google.com"}}';
+							break;
+					}
+
+					console.log(query);
+
+					$.ajax({
+						url: 'http://psg.mtu.edu:21516/alfred/PHPServer/',
+						type: 'post',
+						data: query,
+						dataType: 'json',
+						complete: function(data) {
+							var json = $.parseJSON(data.responseText);
+							if(json.data.key) {
+								apiKey = json.data.key;
+							}
+							console.log(json);
+						}
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<select id="method">
+			<option value="Alfred.Login">Alfred.Login</option>
+			<option value="Alfred.Time">Alfred.Time</option>
+			<option value="Location.Weather">Location.Weather</option>
+			<option value="Minecraft.MOTD">Minecraft.MOTD</option>
+			<option value="Net.Ping">Net.Ping</option>
+		</select>
+		<input type="button" id="submit" value="Submit">
+	</body>
+</html>

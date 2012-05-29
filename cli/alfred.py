@@ -6,7 +6,7 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
+	url = "http://localhost:21516/alfred/PHPServer/"
 	api = "0.1"
 	key = ""
 	intro = "Hello, Sir. How may I help?"
@@ -131,6 +131,24 @@ class Alfred(cmd.Cmd, object):
 		(code, data) = self.request('Alfred.Time')
 		if code >= 0: print(data['data']['time'])
 
+	def help_logout(self):
+		print('logout')
+	
+	def do_logout(self, s):
+		(code, data) = self.request('Alfred.Logout')
+		if code >= 0: print(data['data']['message'])
+	
+	def help_shorten(self):
+		print("shorten <url>")
+	
+	def do_shorten(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			(code, data) = self.request('Net.Shorten', {'url': args[0]})
+			if code >= 0: print(data['data']['url'])
+		else:
+			print("Please specify a URL.")
+
 	def complete_password(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['retrieve', 'add'])
 
@@ -188,12 +206,30 @@ class Alfred(cmd.Cmd, object):
 		args = shlex.split(s)
 		if len(args) > 0:
 			(code, data) = self.request('Location.Weather', {'zip': args[0]})
-			if code >= 0:
-				print("Weather for " + data['data']['location'] + ": " + data['data']['temp'] + "\u00b0C, " + data['data']['text'])
-			else:
-				print("Unknown Twitter command.")
+			if code >= 0: print("Weather for " + data['data']['location'] + ": " + data['data']['temp'] + "\u00b0C, " + data['data']['text'])
 		else:
 			print("Please specify a location.")
+
+	def help_zip(self):
+		print('zip <city>')
+
+	def do_zip(self, s):
+		(code, data) = self.request('Location.Zip', {'city': s})
+		if code >= 0: print("Zip Code: " + data['data']['zip'])
+	
+	def help_areacode(self):
+		print('areacode <city|zip>')
+	
+	def do_areacode(self, s):
+		(code, data) = self.request('Location.AreaCode', {'city': s})
+		if code >= 0: print("Area Code: " + data['data']['areacode'])
+	
+	def help_airport(self):
+		print('airport <city|zip>')
+	
+	def do_airport(self, s):
+		(code, data) = self.request('Location.NearestAirport', {'city': s})
+		if code >= 0: print("Nearest airport: " + data['data']['airport'])
 
 	def help_ping(self):
 		print('ping <host>')
