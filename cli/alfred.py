@@ -6,7 +6,7 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://localhost:21516/alfred/PHPServer/"
+	url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
 	api = "0.1"
 	key = ""
 	intro = "Hello, Sir. How may I help?"
@@ -140,14 +140,14 @@ class Alfred(cmd.Cmd, object):
 
 	def help_logout(self):
 		print('logout')
-	
+
 	def do_logout(self, s):
 		(code, data) = self.request('Alfred.Logout')
 		if code >= 0: print(data['data']['message'])
-	
+
 	def help_shorten(self):
 		print("shorten <url>")
-	
+
 	def do_shorten(self, s):
 		args = shlex.split(s)
 		if len(args) == 1:
@@ -207,7 +207,7 @@ class Alfred(cmd.Cmd, object):
 					return
 				(code, data) = self.request('Net.Twitter.Tweets', {'user': args[1]})
 				if code >= 0:
-					print(", ".join(map(lambda t: t['text'], data['data']['tweets'])))
+					print(", ".join(map(lambda t: "\"" + t['text'] + "\"", data['data']['tweets'])))
 			else:
 				print("Unknown Twitter command.")
 		else:
@@ -230,17 +230,17 @@ class Alfred(cmd.Cmd, object):
 	def do_zip(self, s):
 		(code, data) = self.request('Location.Zip', {'city': s})
 		if code >= 0: print("Zip Code: " + data['data']['zip'])
-	
+
 	def help_areacode(self):
 		print('areacode <city|zip>')
-	
+
 	def do_areacode(self, s):
 		(code, data) = self.request('Location.AreaCode', {'city': s})
 		if code >= 0: print("Area Code: " + data['data']['areacode'])
-	
+
 	def help_airport(self):
 		print('airport <city|zip>')
-	
+
 	def do_airport(self, s):
 		(code, data) = self.request('Location.NearestAirport', {'city': s})
 		if code >= 0: print("Nearest airport: " + data['data']['airport'])
