@@ -16,20 +16,22 @@
 
 				$.ajax({
 					data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
-					complete: function(data) {
-						apiKey = $.parseJSON(data.responseText).data.key;
+					complete: function(json) {
+						apiKey = $.parseJSON(json.responseText).data.key;
+						console.log('{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}');
 
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}',
-							complete: function(data) {
-								$('#bitbucket_status').html($.parseJSON(data.responseText).data.status);
+							complete: function(text) {
+								console.log(text);
+								$('#bitbucket_status').html($.parseJSON(text.responseText).data.description);
 							}
 						});
 
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Github.Status","params":{}}',
-							complete: function(data) {
-								$('#github_status').html($.parseJSON(data.responseText).data.status);
+							complete: function(text) {
+								$('#github_status').html($.parseJSON(text.responseText).data.description);
 							}
 						});
 					}
@@ -74,6 +76,15 @@
 						});
 					}
 				});
+				
+				$('#weather').on('click', function() {
+					$.ajax({
+						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{"zip":"48195"}}',
+						complete: function(json) {
+							console.log(json);
+						}
+					});
+				});
 			});
 		</script>
 	</head>
@@ -85,5 +96,6 @@
 		<input type="button" id="xbmc_left" value="Left">
 		<input type="button" id="xbmc_right" value="Right">
 		<input type="button" id="xbmc_select" value="Select">
+		<input type="button" id="weather" value="Weather">
 	</body>
 </html>
