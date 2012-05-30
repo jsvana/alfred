@@ -16,22 +16,23 @@
 
 				$.ajax({
 					data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
-					complete: function(json) {
-						apiKey = $.parseJSON(json.responseText).data.key;
-						console.log('{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}');
+					success: function(json) {
+						console.log(json);
+						apiKey = json.data.key;
 
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}',
-							complete: function(text) {
+							success: function(text) {
 								console.log(text);
-								$('#bitbucket_status').html($.parseJSON(text.responseText).data.description);
+								$('#bitbucket_status').html(text.data.description);
 							}
 						});
 
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Github.Status","params":{}}',
-							complete: function(text) {
-								$('#github_status').html($.parseJSON(text.responseText).data.description);
+							success: function(text) {
+								console.log(text);
+								$('#github_status').html(text.data.description);
 							}
 						});
 					}
@@ -80,8 +81,8 @@
 				$('#weather').on('click', function() {
 					$.ajax({
 						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{"zip":"48195"}}',
-						complete: function(json) {
-							console.log(json);
+						success: function(json) {
+							alert("Weather for " + json.data.location + ": " + json.data.temp + ", " + json.data.text);
 						}
 					});
 				});
