@@ -262,6 +262,16 @@ Gets Github's status.
 
 ### Net.Twitter
 
+**Net.Twitter**.***Tweets***
+
+Gets the most recent tweets of the given user.
+
+*Parameters:*  
+`user (string)`, the user whose tweets are fetched  
+
+*Returns:*  
+`tweets (json)`, the user's most recent tweets  
+
 **Net.Twitter**.***LastTweet***
 
 Gets the most recent tweet of the given user.

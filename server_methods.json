@@ -333,6 +333,24 @@
 		"namespace" : "Net.Twitter",
 		"methods" : [
 			{
+				"method" : "Net.Twitter.Tweets",
+				"description" : "Gets the most recent tweets of the given user.",
+				"parameters" : [
+					{
+						"name" : "user",
+						"description" : "the user whose tweets are fetched",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "tweets",
+						"description" : "the user's most recent tweets",
+						"type" : "json"
+					}
+				]
+			},
+			{
 				"method" : "Net.Twitter.LastTweet",
 				"description" : "Gets the most recent tweet of the given user.",
 				"parameters" : [
