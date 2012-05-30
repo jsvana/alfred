@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Alfred Test</title>
+		
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script>
+			var apiKey = "";
+
+			$(function() {
+				$.ajaxSetup({
+					url: 'http://psg.mtu.edu:21516/alfred/PHPServer/',
+					type: 'post',
+					dataType: 'json'
+				});
+
+				$.ajax({
+					data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
+					complete: function(data) {
+						apiKey = $.parseJSON(data.responseText).data.key;
+
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}',
+							complete: function(data) {
+								$('#bitbucket_status').html($.parseJSON(data.responseText).data.status);
+							}
+						});
+
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Github.Status","params":{}}',
+							complete: function(data) {
+								$('#github_status').html($.parseJSON(data.responseText).data.status);
+							}
+						});
+					}
+				});
+
+				$('#xbmc_up').on('click', function() {
+					if(apiKey !== '') {
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Up","params":{}}'
+						});
+					}
+				});
+
+				$('#xbmc_down').on('click', function() {
+					if(apiKey !== '') {
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Down","params":{}}'
+						});
+					}
+				});
+
+				$('#xbmc_left').on('click', function() {
+					if(apiKey !== '') {
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Left","params":{}}'
+						});
+					}
+				});
+
+				$('#xbmc_right').on('click', function() {
+					if(apiKey !== '') {
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Right","params":{}}'
+						});
+					}
+				});
+
+				$('#xbmc_select').on('click', function() {
+					if(apiKey !== '') {
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Select","params":{}}'
+						});
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<p id="bitbucket_status"></p>
+		<p id="github_status"></p>
+		<input type="button" id="xbmc_up" value="Up">
+		<input type="button" id="xbmc_down" value="Down">
+		<input type="button" id="xbmc_left" value="Left">
+		<input type="button" id="xbmc_right" value="Right">
+		<input type="button" id="xbmc_select" value="Select">
+	</body>
+</html>
