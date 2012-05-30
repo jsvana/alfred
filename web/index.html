@@ -35,6 +35,21 @@
 								$('#github_status').html(text.data.description);
 							}
 						});
+
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{"zip":"48195"}}',
+							success: function(text) {
+								$('#weather').html("Weather for " + text.data.location + ": " + text.data.temp + "\u00b0C, " + text.data.text)
+							}
+						});
+
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Minecraft.Players","params":{"server":"keepcraft.in"}}',
+							success: function(text) {
+								var count = parseInt(text.data.players);
+								$('#minecraft_players').html("There " + (count == 1 ? "is" : "are") + " currently " + text.data.players + " player" + (count == 1 ? "" : "s") + " on keepcraft.in.")
+							}
+						});
 					}
 				});
 
@@ -77,26 +92,18 @@
 						});
 					}
 				});
-				
-				$('#weather').on('click', function() {
-					$.ajax({
-						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{"zip":"48195"}}',
-						success: function(json) {
-							alert("Weather for " + json.data.location + ": " + json.data.temp + ", " + json.data.text);
-						}
-					});
-				});
 			});
 		</script>
 	</head>
 	<body>
 		<p id="bitbucket_status"></p>
 		<p id="github_status"></p>
+		<p id="weather"></p>
+		<p id="minecraft_players"></p>
 		<input type="button" id="xbmc_up" value="Up">
 		<input type="button" id="xbmc_down" value="Down">
 		<input type="button" id="xbmc_left" value="Left">
 		<input type="button" id="xbmc_right" value="Right">
 		<input type="button" id="xbmc_select" value="Select">
-		<input type="button" id="weather" value="Weather">
 	</body>
 </html>
