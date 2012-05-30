@@ -225,9 +225,6 @@
 				$ret = alfred_result(0, array("time" => $date, "description" => $status));
 			}
 			break;
-
-
-			https://status.github.com/status.json
 		case "Net.Ping":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
