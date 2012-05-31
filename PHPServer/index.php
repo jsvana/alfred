@@ -27,9 +27,13 @@
 				$username = $params->username;
 				$password = $params->password;
 
-				if(mysql_num_rows(mysql_query("SELECT `username` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';")) > 0) {
+				$result = mysql_query("SELECT `id` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';");
+
+				if($result) {
+					$row = mysql_fetch_assoc($result);
+					$userID = $row['id'];
 					$key = md5($username . $password . time());
-					mysql_query("INSERT INTO `sessions` (api_key, expiration) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR));");
+					mysql_query("INSERT INTO `sessions` (api_key, expiration, user_id) VALUES ('" . $key . "', DATE_ADD(NOW(), INTERVAL 1 HOUR), " . $userID . ");");
 
 					$ret = alfred_result(0, array("key" => $key));
 				} else {
@@ -54,10 +58,18 @@
 		case "Location.Weather":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
-			} else if(($message = validate_parameters($params, array("zip"))) !== "") {
+			} else if(($message = validate_parameters($params, array("zip"), array("zip" => true))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $params->zip . "&u=c");
+				$config = get_config($data->key);
+
+				if(!isset($params->zip)) {
+					$zip = $config['zip'];
+				} else {
+					$zip = $params->zip;
+				}
+
+				$weather_feed = file_get_contents("http://weather.yahooapis.com/forecastrss?p=" . $zip . "&u=c");
 				$weather = simplexml_load_string($weather_feed);
 				if(!$weather) die('weather failed');
 				$copyright = $weather->channel->copyright;
@@ -456,7 +468,7 @@
 
 	echo $ret;
 
-	function validate_parameters($params, $valid) {
+	function validate_parameters($params, $valid, $optional = null) {
 		if(count($params) > count($valid)) {
 			return "Too many parameters.";
 		}
@@ -466,7 +478,9 @@
 
 		foreach($valid as $key) {
 			if(!isset($params->{$key})) {
-				$missing[$key] = true;
+				if(isset($optional[$key]) && !$optional[$key] || !isset($optional[$key])) {
+					$missing[$key] = true;
+				}
 			} else if($params->{$key} === "") {
 				$empty[$key] = true;
 			}
@@ -543,6 +557,13 @@
 		return $json;
 	}
 
+	function get_config($key) {
+		$result = mysql_query("SELECT `users`.`username`, `configs`.`zip`, `configs`.`bitbucket_user` FROM `users`, `configs`, `sessions` WHERE `users`.`id`=`sessions`.`user_id` AND `configs`.`id`=`users`.`config_id` LIMIT 1;");
+
+		$row = mysql_fetch_assoc($result);
+
+		return array('username' => $row['username'], 'zip' => $row['zip'], 'bitbucket_user' => $row['bitbucket_user']);
+	}
 	function minecraft_ping($host, $port = 25565, $timeout = 30) {
 		//Set up our socket
 		$fp = fsockopen($host, $port, $errno, $errstr, $timeout);
