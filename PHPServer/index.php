@@ -65,6 +65,10 @@
 
 				if(!isset($params->zip)) {
 					$zip = $config['zip'];
+
+					if($zip === null) {
+						echo alfred_error(-4, array("message" => "Zip code cannot be blank."));
+					}
 				} else {
 					$zip = $params->zip;
 				}
@@ -90,7 +94,7 @@
 					}
 				}
 
-				$ret = alfred_result(0, array("location" => $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'], "text" => "{$yw_forecast['condition']['text']}", "temp" => "{$yw_forecast['condition']['temp']}", "date" => "{$yw_forecast['condition']['date']}"));
+				$ret = alfred_result(0, array("zip" => $zip, "location" => $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'], "text" => "{$yw_forecast['condition']['text']}", "temp" => "{$yw_forecast['condition']['temp']}", "date" => "{$yw_forecast['condition']['date']}"));
 			}
 			break;
 		case "Location.Zip":
@@ -558,7 +562,7 @@
 	}
 
 	function get_config($key) {
-		$result = mysql_query("SELECT `users`.`username`, `configs`.`zip`, `configs`.`bitbucket_user` FROM `users`, `configs`, `sessions` WHERE `users`.`id`=`sessions`.`user_id` AND `configs`.`id`=`users`.`config_id` LIMIT 1;");
+		$result = mysql_query("SELECT `users`.`username`, `configs`.`zip`, `configs`.`bitbucket_user` FROM `users`, `configs`, `sessions` WHERE `sessions`.`api_key`='" . $key . "' AND `users`.`id`=`sessions`.`user_id` AND `configs`.`id`=`users`.`config_id` LIMIT 1;");
 
 		$row = mysql_fetch_assoc($result);
 

@@ -39,6 +39,7 @@
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{}}',
 							success: function(text) {
+								console.log(text);
 								$('#weather').html("Weather for " + text.data.location + ": " + text.data.temp + "\u00b0C, " + text.data.text)
 							}
 						});
