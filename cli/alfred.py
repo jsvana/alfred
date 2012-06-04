@@ -6,13 +6,14 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
+	#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
+	url = "http://alfred.phpfogapp.com/PHPServer/"
 	api = "0.1"
 	key = ""
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = False
+	debug = True
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
