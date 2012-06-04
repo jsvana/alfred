@@ -5,3 +5,5 @@ alfred.rpc
 config.php
 config.h
 __pycache__
+*.pem
+
