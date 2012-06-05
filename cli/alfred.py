@@ -6,8 +6,9 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
+	url = "http://localhost:21516/alfred/PHPServer/"
 	#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
-	url = "http://alfred.phpfogapp.com/PHPServer/"
+	#url = "http://alfred.phpfogapp.com/PHPServer/"
 	api = "0.1"
 	key = ""
 	intro = "Hello, Sir. How may I help?"
@@ -213,6 +214,18 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Twitter command.")
 		else:
 			print("Unknown Twitter command.")
+	
+	def help_currency(self):
+		print('currency <amount> <from> in <to>')
+	
+	def do_currency(self, s):
+		args = shlex.split(s)
+		if len(args) == 4:
+			(code, data) = self.request('Location.Currency', {'amount': args[0], 'from': args[1], 'to': args[3]})
+			if code >= 0:
+				print(str(data['data']['amount']) + ' ' + args[3])
+		else:
+			print('Incorrect arguments.')
 
 	def help_weather(self):
 		print('weather <zip>')

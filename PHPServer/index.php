@@ -1,6 +1,8 @@
 <?php
 	session_start();
 
+	include("config.php");
+
 	$data = json_decode(file_get_contents("php://input"));
 
 	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
@@ -93,6 +95,31 @@
 				}
 
 				$ret = alfred_result(0, array("zip" => $zip, "location" => $yw_channel['location']['city'] . ", " . $yw_channel['location']['region'], "text" => "{$yw_forecast['condition']['text']}", "temp" => "{$yw_forecast['condition']['temp']}", "date" => "{$yw_forecast['condition']['date']}"));
+			}
+			break;
+		case "Location.Currency":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("amount", "from", "to"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ch = curl_init('http://openexchangerates.org/latest.json');
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+				$json = curl_exec($ch);
+				curl_close($ch);
+
+				$exchangeRates = json_decode($json);
+
+				if(!isset($exchangeRates->rates->{strtoupper($params->from)}) || !isset($exchangeRates->rates->{strtoupper($params->to)})) {
+					$ret = alfred_error(-5, array("message" => "Unknown currencies."));
+				} else if(!is_numeric($params->amount)) {
+					$ret = alfred_error(-5, array("message" => "Amount must be a valid number."));
+				} else {
+					$from = strtoupper($params->from);
+					$to = strtoupper($params->to);
+					$ret = alfred_result(0, array("amount" => ($params->amount * (float)$exchangeRates->rates->{$to} / (float)$exchangeRates->rates->{$from})));
+				}
 			}
 			break;
 		case "Location.Zip":
@@ -631,7 +658,13 @@
 	}
 
 	function session_authenticated($key) {
-		return mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($key) . "' AND `expiration`>NOW();");
+		if(!isset($key)) {
+			return false;
+		} else if($key === "") {
+			return false;
+		} else {
+			return mysql_query("UPDATE `sessions` SET `expiration`=DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE `api_key`='" . mysql_real_escape_string($key) . "' AND `expiration`>NOW();");
+		}
 	}
 
 	function get_alfred_commands() {

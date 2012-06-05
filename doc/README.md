@@ -122,6 +122,18 @@ Fetches current weather for a given zip code.
 `temp (string)`, the current temperature (in Celcius)  
 `date (string)`, the date of the conditions  
 
+**Location**.***Currency***
+
+Converts currency amounts.
+
+*Parameters:*  
+`amount (string)`, the amount to be converted  
+`from (string)`, the original currency  
+`to (string)`, the new currency  
+
+*Returns:*  
+`amount (number)`, the new amount  
+
 **Location**.***Zip***
 
 Fetches Zip Code of the given city.

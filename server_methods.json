@@ -76,6 +76,34 @@
 				]
 			},
 			{
+				"method" : "Location.Currency",
+				"description" : "Converts currency amounts.",
+				"parameters" : [
+					{
+						"name" : "amount",
+						"description" : "the amount to be converted",
+						"type" : "string"
+					},
+					{
+						"name" : "from",
+						"description" : "the original currency",
+						"type" : "string"
+					},
+					{
+						"name" : "to",
+						"description" : "the new currency",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "amount",
+						"description" : "the new amount",
+						"type" : "number"
+					}
+				]
+			},
+			{
 				"method" : "Location.Zip",
 				"description" : "Fetches Zip Code of the given city.",
 				"parameters" : [
