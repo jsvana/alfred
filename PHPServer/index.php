@@ -11,8 +11,8 @@
 	$method = $data->method;
 	$params = $data->params;
 
-	mysql_connect($server = getenv('MYSQL_DB_HOST'), $username = getenv('MYSQL_USERNAME'), $password = getenv('MYSQL_PASSWORD'));
-	mysql_select_db(getenv('MYSQL_DB_NAME'));
+	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
+	mysql_select_db($MYSQL_DATABASE);
 
 	$ret = "";
 
