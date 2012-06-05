@@ -7,3 +7,6 @@ config.h
 __pycache__
 *.pem
 env.sh
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
