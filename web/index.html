@@ -23,7 +23,6 @@
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Bitbucket.Status","params":{}}',
 							success: function(text) {
-								console.log(text);
 								$('#bitbucket_status').html(text.data.description);
 							}
 						});
@@ -31,7 +30,6 @@
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.Github.Status","params":{}}',
 							success: function(text) {
-								console.log(text);
 								$('#github_status').html(text.data.description);
 							}
 						});
@@ -39,7 +37,6 @@
 						$.ajax({
 							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{}}',
 							success: function(text) {
-								console.log(text);
 								$('#weather').html("Weather for " + text.data.location + ": " + text.data.temp + "\u00b0C, " + text.data.text)
 							}
 						});
@@ -49,6 +46,13 @@
 							success: function(text) {
 								var count = parseInt(text.data.players);
 								$('#minecraft_players').html("There " + (count == 1 ? "is" : "are") + " currently " + text.data.players + " player" + (count == 1 ? "" : "s") + " on keepcraft.in.")
+							}
+						});
+
+						$.ajax({
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Net.ClientIP","params":{}}',
+							success: function(text) {
+								$('#client_ip').html(text.data.ip)
 							}
 						});
 					}
@@ -81,7 +85,10 @@
 				$('#xbmc_right').on('click', function() {
 					if(apiKey !== '') {
 						$.ajax({
-							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Right","params":{}}'
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Right","params":{}}',
+							success: function(text) {
+								console.log(text);
+							}
 						});
 					}
 				});
@@ -101,6 +108,7 @@
 		<p id="github_status"></p>
 		<p id="weather"></p>
 		<p id="minecraft_players"></p>
+		<p id="client_ip"></p>
 		<input type="button" id="xbmc_up" value="Up">
 		<input type="button" id="xbmc_down" value="Down">
 		<input type="button" id="xbmc_left" value="Left">

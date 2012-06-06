@@ -237,7 +237,7 @@
 			}
 			break;
 
-		/* Net */
+		/* Net.Bitbucket */
 		case "Net.Bitbucket.Followers":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -261,6 +261,8 @@
 				$ret = alfred_result(0, array("time" => "{$latestItem->title}", "description" => "{$latestItem->description}"));
 			}
 			break;
+
+		/* Net.Github */
 		case "Net.Github.Status":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -284,6 +286,32 @@
 				$ret = alfred_result(0, array("time" => $date, "description" => $status));
 			}
 			break;
+
+		/* Net.TMDB */
+		case "Net.TMDB.Movie":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("title"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$title = $params->title;
+
+				$url = "http://api.themoviedb.org/3/search/movie?query=" . url_encode($title) . "&api_key=" . $TMDB_KEY;
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: application/json'));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+				$content = curl_exec($ch);
+
+				$json = json_decode($content);
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"total_results\":" . $json->total_results . ",\"first_result\":" . json_encode($json->results[0]) . "}}";
+			}
+			break;
+
+		/* Net */
 		case "Net.ClientIP":
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);

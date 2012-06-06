@@ -14,7 +14,7 @@ class Alfred(cmd.Cmd, object):
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = True
+	debug = False
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
@@ -213,7 +213,31 @@ class Alfred(cmd.Cmd, object):
 			else:
 				print("Unknown Twitter command.")
 		else:
-			print("Unknown Twitter command.")
+			print("Please specify a Twitter command.")
+	
+	def complete_tmdb(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['movie '])
+	
+	def help_tmdb(self):
+		print('tmdb movie <title>')
+	
+	def do_tmdb(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == "movie":
+				if len(args) < 2:
+					print("Please specify a movie.")
+					return
+				(code, data) = self.request('Net.TMDB.Movie', {'title': " ".join(args[1:])})
+				if code >= 0:
+					if data['data']['total_results'] > 0:
+						print("First result: " + data['data']['first_result']['title'] + ", released " + data['data']['first_result']['release_date'] + " and rated " + str(data['data']['first_result']['vote_average']) + " out of 10.")
+					else:
+						print("No results found.")
+			else:
+				print("Unknown TMDB command.")
+		else:
+			print("Please specify a TMDB command.")
 	
 	def help_currency(self):
 		print('currency <amount> <from> in <to>')
