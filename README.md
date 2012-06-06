@@ -296,6 +296,19 @@ Gets Github's status.
 `time (string)`, the time of the latest update  
 `description (string)`, the latest status description  
 
+### Net.TMDB
+
+**Net.TMDB**.***Movie***
+
+Finds first movie resulting from given title
+
+*Parameters:*  
+`title (string)`, the query title  
+
+*Returns:*  
+`total_results (number)`, the number of returned results  
+`first_result (json)`, the first returned result  
+
 ### Net.Twitter
 
 **Net.Twitter**.***Tweets***

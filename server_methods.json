@@ -414,6 +414,34 @@
 		]
 	},
 	{
+		"namespace" : "Net.TMDB",
+		"methods" : [
+			{
+				"method" : "Net.TMDB.Movie",
+				"description" : "Finds first movie resulting from given title",
+				"parameters" : [
+					{
+						"name" : "title",
+						"description" : "the query title",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "total_results",
+						"description" : "the number of returned results",
+						"type" : "number"
+					},
+					{
+						"name" : "first_result",
+						"description" : "the first returned result",
+						"type" : "json"
+					}
+				]
+			}
+		]
+	},
+	{
 		"namespace" : "Net.Twitter",
 		"methods" : [
 			{
