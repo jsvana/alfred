@@ -109,6 +109,21 @@ Gets the server time.
 
 ### Location
 
+**Location**.***IPLookup***
+
+Gets the physical location of an IP address.
+
+*Parameters:*  
+`ip (string)`, the IP address to look up  
+
+*Returns:*  
+`ipAddress (string)`, the IP address queried  
+`countryCode (string)`, the short country name  
+`countryName (string)`, the country containing the IP address  
+`regionName (string)`, the region (usually the state) containing the IP address  
+`cityName (string)`, the city containing the IP address  
+`zipCode (string)`, the zip code containing the IP address  
+
 **Location**.***Weather***
 
 Fetches current weather for a given zip code.
@@ -197,6 +212,15 @@ Gets the max player count of the given server.
 `maxPlayers (string)`, the maximum number of players allowed on the Minecraft server  
 
 ### Net
+
+**Net**.***ClientIP***
+
+Returns the connecting client's IP address
+
+*Parameters:* `none`
+
+*Returns:*  
+`ip (string)`, the client's IP address  
 
 **Net**.***Ping***
 

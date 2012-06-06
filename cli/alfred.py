@@ -238,6 +238,24 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a location.")
 
+	def help_iplookup(self):
+		print('iplookup <ip>')
+	
+	def do_iplookup(self, s):
+		args  = shlex.split(s)
+		if len(args) > 0:
+			(code, data) = self.request('Location.IPLookup', {'ip': args[0]})
+			if code >= 0: print("Location: " + data['data']['cityName'] + ", " + data['data']['regionName'] + ", " + data['data']['countryName'])
+		else:
+			print("Please specify an IP address.")
+	
+	def help_ip(self):
+		print('ip')
+	
+	def do_ip(self, s):
+		(code, data) = self.request('Net.ClientIP')
+		if code >= 0: print("My IP: " + data['data']['ip'])
+
 	def help_zip(self):
 		print('zip <city>')
 

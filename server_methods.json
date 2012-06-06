@@ -43,6 +43,50 @@
 		"namespace" : "Location",
 		"methods" : [
 			{
+				"method" : "Location.IPLookup",
+				"description" : "Gets the physical location of an IP address.",
+				"parameters" : [
+					{
+
+						"name" : "ip",
+						"description" : "the IP address to look up",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "ipAddress",
+						"description" : "the IP address queried",
+						"type" : "string"
+					},
+					{
+						"name" : "countryCode",
+						"description" : "the short country name",
+						"type" : "string"
+					},
+					{
+						"name" : "countryName",
+						"description" : "the country containing the IP address",
+						"type" : "string"
+					},
+					{
+						"name" : "regionName",
+						"description" : "the region (usually the state) containing the IP address",
+						"type" : "string"
+					},
+					{
+						"name" : "cityName",
+						"description" : "the city containing the IP address",
+						"type" : "string"
+					},
+					{
+						"name" : "zipCode",
+						"description" : "the zip code containing the IP address",
+						"type" : "string"
+					}
+				]
+			},
+			{
 				"method" : "Location.Weather",
 				"description" : "Fetches current weather for a given zip code.",
 				"parameters" : [
@@ -221,6 +265,18 @@
 	{
 		"namespace" : "Net",
 		"methods" : [
+			{
+				"method" : "Net.ClientIP",
+				"description" : "Returns the connecting client's IP address",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "ip",
+						"description" : "the client's IP address",
+						"type" : "string"
+					}
+				]
+			},
 			{
 				"method" : "Net.Ping",
 				"description" : "Pings a host from the server.",

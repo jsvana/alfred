@@ -55,6 +55,24 @@
 			break;
 
 		/* Location */
+		case "Location.IPLookup":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("ip"), array("ip" => true))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				if(!isset($params->ip)) {
+					$ip = $_SERVER['REMOTE_ADDR'];
+				} else {
+					$ip = $params->ip;
+				}
+
+				$url = "http://api.ipinfodb.com/v3/ip-city/?key=" . $IP_INFO_DB_KEY . "&ip=" . url_encode($ip) . "&format=json";
+				$json = file_get_contents($url);
+				
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . json_encode(json_decode($json)) . "}";
+			}
+			break;
 		case "Location.Weather":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -264,6 +282,13 @@
 				$date = $json->last_updated;
 
 				$ret = alfred_result(0, array("time" => $date, "description" => $status));
+			}
+			break;
+		case "Net.ClientIP":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$ret = alfred_result(0, array("ip" => $_SERVER['REMOTE_ADDR']));
 			}
 			break;
 		case "Net.Ping":
