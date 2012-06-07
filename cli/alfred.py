@@ -210,6 +210,9 @@ class Alfred(cmd.Cmd, object):
 				(code, data) = self.request('Net.Twitter.Tweets', {'user': args[1]})
 				if code >= 0:
 					print(", ".join(map(lambda t: "\"" + t['text'] + "\"", data['data']['tweets'])))
+			elif args[0] == "startauth":
+				(code, data) = self.request('Net.Twitter.StartAuth')
+				if code >= 0: print(data['data']['url'])
 			else:
 				print("Unknown Twitter command.")
 		else:

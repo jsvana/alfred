@@ -2,6 +2,8 @@
 	session_start();
 
 	include("config.php");
+	include("oauth/globals.php");
+	include("oauth/oauth_helper.php");
 
 	$data = json_decode(file_get_contents("php://input"));
 
@@ -374,6 +376,80 @@
 			break;
 
 		/* Net.Twitter */
+		case "Net.Twitter.StartAuth":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$callback = 'oob';
+
+				$config = get_config($data->key);
+
+				if(!empty($config['twitter_oauth_token'])) {
+					$ret = alfred_result(0, array("message" => "Account already authenticated with Twitter."));
+				} else if(!empty($config['twitter_access_token'])) {
+					$ret = alfred_result(0, array("message" => "Authentication already started with Twitter."));
+				} else {
+					$retarr = get_request_token($TWITTER_KEY, $TWITTER_SECRET_KEY, $callback, false, true, true);
+
+					if(!empty($retarr)) {
+						list($info, $headers, $body, $body_parsed) = $retarr;
+
+						mysql_query("UPDATE `configs` INNER JOIN `users` ON `configs`.`id`=`users`.`config_id` INNER JOIN `sessions` ON `sessions`.`user_id`=`users`.`id` SET `configs`.`twitter_access_token`='" . mysql_real_escape_string($body_parsed['oauth_token']) . "', `configs`.`twitter_access_token_secret`='" . mysql_real_escape_string($body_parsed['oauth_token_secret']) . "' WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "';");
+
+						$ret = alfred_result(0, array("url" => "http://api.twitter.com/oauth/authorize?" . rfc3986_decode($body)));
+					} else {
+						$ret = alfred_error(-5, array("message" => "Error communicating with Twitter."));
+					}
+				}
+			}
+			break;
+		case "Net.Twitter.CompleteAuth":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("verifier"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$config = get_config($data->key);
+
+				if(!empty($config['twitter_oauth_token'])) {
+					$ret = alfred_result(0, array("message" => "Account already authenticated with Twitter."));
+				} else if(empty($config['twitter_access_token'])) {
+					$ret = alfred_result(0, array("message" => "You must first call Net.Twitter.StartAuth."));
+				} else {
+					$request_token = $config['twitter_access_token'];
+					$request_token_secret = $config['twitter_access_token_secret'];
+					$oauth_verifier = $params->verifier;
+
+					$retarr = get_access_token(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, $request_token, $request_token_secret, $oauth_verifier, false, true, true);
+					if(!empty($retarr)) {
+						list($info, $headers, $body, $body_parsed) = $retarr;
+						if($info['http_code'] == 200 && !empty($body)) {
+							$ret = alfred_result(0, array("message" => "Authentication successful."));
+						} else {
+							$ret = alfred_result(0, array("message" => "Authentication unsuccessful."));
+						}
+					} else {
+						$ret = alfred_result(0, array("message" => "Error communicating with Twitter."));
+					}
+				}
+			}
+			break;
+
+
+
+	// Fill in the next 3 variables.
+	$request_token='c6oRe7VAIJeRLdD95b2WiTUudj73xilu36IfT2jlUEg';
+	$request_token_secret='wv7bjNW4Uds4QjH664cBeBpIyYbrPNnZZlw7hvYYQg';
+	$oauth_verifier= '0386243';
+
+	// Get the access token using HTTP GET and HMAC-SHA1 signature
+	$retarr = get_access_token(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, $request_token, $request_token_secret, $oauth_verifier, false, true, true);
+	if (! empty($retarr)) {
+		list($info, $headers, $body, $body_parsed) = $retarr;
+		if ($info['http_code'] == 200 && !empty($body)) {
+			print "\nUse the new oauth_token and oauth_token_secret for all of your API calls\n";
+		}
+	}
 		case "Net.Twitter.LastTweet":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -640,12 +716,14 @@
 	}
 
 	function get_config($key) {
-		$result = mysql_query("SELECT `users`.`username`, `configs`.`zip`, `configs`.`bitbucket_user` FROM `users`, `configs`, `sessions` WHERE `sessions`.`api_key`='" . $key . "' AND `users`.`id`=`sessions`.`user_id` AND `configs`.`id`=`users`.`config_id` LIMIT 1;");
+		$query = "SELECT `users`.`username`, `configs`.* FROM `users`, `configs`, `sessions` WHERE `sessions`.`api_key`='" . $key . "' AND `users`.`id`=`sessions`.`user_id` AND `configs`.`id`=`users`.`config_id` LIMIT 1;";
+		$result = mysql_query($query);
 
 		$row = mysql_fetch_assoc($result);
 
-		return array('username' => $row['username'], 'zip' => $row['zip'], 'bitbucket_user' => $row['bitbucket_user']);
+		return array('username' => $row['username'], 'zip' => $row['zip'], 'bitbucket_user' => $row['bitbucket_user'], 'twitter_oauth_token' => $row['twitter_oauth_token'], 'twitter_oauth_token_secret' => $row['twitter_oauth_token_secret'], 'twitter_access_token' => $row['twitter_access_token'], 'twitter_access_token_secret' => $row['twitter_access_token_secret']);
 	}
+
 	function minecraft_ping($host, $port = 25565, $timeout = 30) {
 		//Set up our socket
 		$fp = fsockopen($host, $port, $errno, $errstr, $timeout);
@@ -722,5 +800,117 @@
 
 	function get_alfred_commands() {
 		$commands = "[{\"method\":\"Alfred.Login\",\"description\":\"Initiates session with the server.\",\"parameters\":[{\"name\":\"username\",\"description\":\"the username for the user\",\"type\":\"string\"},{\"name\":\"password\", \"description\":\"the password for the user\",\"type\":\"string\"}],\"returns\":[{\"name\":\"key\",\"description\":\"the API key for the user\",\"type\":\"string\"}]},{\"method\":\"Alfred.Time\",\"description\":\"Gets the server time.\",\"parameters\":[ ],\"returns\":[{\"name\":\"time\",\"type\":\"string\",\"format\":\"YYYY-mm-dd hh:mm:ss GMT-hh:mm\"}]},{\"method\":\"Location.Weather\",\"description\":\"Fetches current weather for a given zip code.\",\"parameters\":[{\"name\":\"zip\",\"description\":\"the zip code for the area\",\"type\":\"string\"}],\"returns\":[{\"name\":\"location\",\"description\":\"the city and state for the conditions\",\"type\":\"string\"},{\"name\":\"text\",\"description\":\"a description of the conditions\",\"type\":\"string\"},{\"name\":\"temp\",\"description\":\"the current temperature (in Celcius)\",\"type\":\"string\"},{\"name\":\"date\",\"description\":\"the date of the conditions\",\"type\":\"string\"}]},{\"method\":\"Minecraft.MOTD\",\"description\":\"Gets the MOTD of the given server.\",\"parameters\":[{\"name\":\"server\",\"description\":\"the Minecraft server to access\",\"type\":\"string\"}],\"returns\":[{\"name\":\"motd\",\"description\":\"the message of the day of the Minecraft server\",\"type\":\"string\"}]},{\"method\":\"Minecraft.Players\",\"description\":\"Gets the current player count of the given server.\",\"parameters\":[{\"name\":\"server\",\"description\":\"the Minecraft server to access\",\"type\":\"string\"}],\"returns\":[{\"name\":\"players\",\"description\":\"the number of players on the Minecraft server\",\"type\":\"string\"}]},{\"method\":\"Minecraft.MaxPlayers\",\"description\":\"Gets the max player count of the given server.\",\"parameters\":[{\"name\":\"server\",\"description\":\"the Minecraft server to access\",\"type\":\"string\"}],\"returns\":[{\"name\":\"maxPlayers\",\"description\":\"the maximum number of players allowed on the Minecraft server\",\"type\":\"string\"}]},{\"method\":\"Net.Ping\",\"description\":\"Pings a host from the server.\",\"parameters\":[{\"name\":\"host\",\"description\":\"the host to ping\",\"type\":\"string\"}],\"returns\":[{\"name\":\"response\",\"description\":\"the ping response from the host\",\"type\":\"string\"}]},{\"method\":\"Net.DNS\",\"description\":\"Looks up a host from the server.\",\"parameters\":[{\"name\":\"host\",\"description\":\"the host to lookup\",\"type\":\"string\"}],\"returns\":[{\"name\":\"response\",\"description\":\"the DNS lookup results for the host\",\"type\":\"string\"}]},{\"method\":\"Net.Shorten\",\"description\":\"Shortens a given URL.\",\"parameters\":[{\"name\":\"url\",\"description\":\"the URL to shorten\",\"type\":\"string\"}],\"returns\":[{\"name\":\"url\",\"description\":\"the shortened URL\",\"type\":\"string\"}]},{\"method\":\"Net.LMGTFY\",\"description\":\"Gives an LMGTFY URL from the given string.\",\"parameters\":[{\"name\":\"text\",\"description\":\"the text to be included in the URL\",\"type\":\"string\"}],\"returns\":[{\"name\":\"url\",\"description\":\"the query URL\",\"type\":\"string\"}]},{\"method\":\"Net.Twitter.LastTweet\",\"description\":\"Gets the most recent tweet of the given user.\",\"parameters\":[{\"name\":\"user\",\"description\":\"the user whose tweet is fetched\",\"type\":\"string\"}],\"returns\":[{\"name\":\"tweet\",\"description\":\"the user's most recent tweet\",\"type\":\"string\"}]},{\"method\":\"Password.Add\",\"description\":\"Adds a password to the password manager.\",\"parameters\":[{\"name\":\"site\",\"description\":\"the site for which the password is retrieved\",\"type\":\"string\"},{\"name\":\"user\",\"description\":\"the user of the password\",\"type\":\"string\"},{\"name\":\"new\",\"description\":\"the new password that is added\",\"type\":\"string\"},{\"name\":\"master\",\"description\":\"the encryption key and identity verification\",\"type\":\"string\"}],\"returns\":[{\"name\":\"message\",\"description\":\"the status of the password insertion\",\"type\":\"string\"}]},{\"method\":\"Password.Retrieve\",\"description\":\"Retrieves a password from the password manager.\",\"parameters\":[{\"name\":\"site\",\"description\":\"the site for which the password is retrieved\",\"type\":\"string\"},{\"name\":\"user\",\"description\":\"the user of the password\",\"type\":\"string\"},{\"name\":\"master\",\"description\":\"the encryption key and identity verification\",\"type\":\"string\"}],\"returns\":[{\"name\":\"password\",\"description\":\"the retrieved password\",\"type\":\"string\"}]},{\"method\":\"XBMC.Pause\",\"description\":\"Pauses current stream.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Next\",\"description\":\"Skips to next song in queue.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Previous\",\"description\":\"Skips to previous song in queue.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Shuffle\",\"description\":\"Shuffles Now Playing queue.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Mute\",\"description\":\"Mutes XBMC.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Unmute\",\"description\":\"Unmutes XBMC.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Up\",\"description\":\"Moves XBMC selection up.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Down\",\"description\":\"Moves XBMC selection down.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Left\",\"description\":\"Moves XBMC selection left.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Right\",\"description\":\"Moves XBMC selection right.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Select\",\"description\":\"Makes XBMC selection.\",\"parameters\":[ ],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]},{\"method\":\"XBMC.Volume\",\"description\":\"Sets XBMC volume.\",\"parameters\":[{\"name\":\"volume\",\"description\":\"the player's new volume\",\"type\":\"string\"}],\"returns\":[{\"name\":\"message\",\"description\":\"the result of the command.\",\"type\":\"string\"}]}]";
+	}
+
+	function get_request_token($consumer_key, $consumer_secret, $callback, $usePost=false, $useHmacSha1Sig=true, $passOAuthInHeader=false)
+	{
+		$retarr = array();  // return value
+		$response = array();
+
+		$url = 'http://api.twitter.com/oauth/request_token';
+		$params['oauth_version'] = '1.0';
+		$params['oauth_nonce'] = mt_rand();
+		$params['oauth_timestamp'] = time();
+		$params['oauth_consumer_key'] = $consumer_key;
+		$params['oauth_callback'] = $callback;
+
+		// compute signature and add it to the params list
+		if ($useHmacSha1Sig) {
+			$params['oauth_signature_method'] = 'HMAC-SHA1';
+			$params['oauth_signature'] = oauth_compute_hmac_sig($usePost? 'POST' : 'GET', $url, $params, $consumer_secret, null);
+		} else {
+			$params['oauth_signature_method'] = 'PLAINTEXT';
+			$params['oauth_signature'] = oauth_compute_plaintext_sig($consumer_secret, null);
+		}
+
+		// Pass OAuth credentials in a separate header or in the query string
+		if ($passOAuthInHeader) {
+			$query_parameter_string = oauth_http_build_query($params, true);
+			$header = build_oauth_header($params, "Twitter API");
+			$headers[] = $header;
+		} else {
+			$query_parameter_string = oauth_http_build_query($params);
+		}
+
+		// POST or GET the request
+		if ($usePost) {
+			$request_url = $url;
+			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+			$response = do_post($request_url, $query_parameter_string, 80, $headers);
+		} else {
+			$request_url = $url . ($query_parameter_string ? ('?' . $query_parameter_string) : '' );
+			$response = do_get($request_url, 80, $headers);
+		}
+
+		// extract successful response
+		if (! empty($response)) {
+			list($info, $header, $body) = $response;
+			$body_parsed = oauth_parse_str($body);
+			if (! empty($body_parsed)) {
+				$retarr['oauth_token'] = $body_parsed['oauth_token'];
+				$retarr['oauth_token_secret'] = $body_parsed['oauth_token_secret'];
+				$retarr['oauth_callback_confirmed'] = $body_parsed['oauth_callback_confirmed'];
+			}
+			$retarr = $response;
+			$retarr[] = $body_parsed;
+		}
+
+		return $retarr;
+	}
+
+	function get_access_token($consumer_key, $consumer_secret, $request_token, $request_token_secret, $oauth_verifier, $usePost=false, $useHmacSha1Sig=true, $passOAuthInHeader=true)
+	{
+		$retarr = array();  // return value
+		$response = array();
+
+		$url = 'http://api.twitter.com/oauth/access_token';
+		$params['oauth_version'] = '1.0';
+		$params['oauth_nonce'] = mt_rand();
+		$params['oauth_timestamp'] = time();
+		$params['oauth_consumer_key'] = $consumer_key;
+		$params['oauth_token']= $request_token;
+		$params['oauth_verifier'] = $oauth_verifier;
+
+		// compute signature and add it to the params list
+		if ($useHmacSha1Sig) {
+			$params['oauth_signature_method'] = 'HMAC-SHA1';
+			$params['oauth_signature'] =
+			oauth_compute_hmac_sig($usePost? 'POST' : 'GET', $url, $params, $consumer_secret, $request_token_secret);
+		} else {
+			$params['oauth_signature_method'] = 'PLAINTEXT';
+			$params['oauth_signature'] =
+			oauth_compute_plaintext_sig($consumer_secret, $request_token_secret);
+		}
+
+		// Pass OAuth credentials in a separate header or in the query string
+		if ($passOAuthInHeader) {
+			$query_parameter_string = oauth_http_build_query($params, true);
+			$header = build_oauth_header($params, "Twitter API");
+			$headers[] = $header;
+		} else {
+			$query_parameter_string = oauth_http_build_query($params);
+		}
+
+		// POST or GET the request
+		if ($usePost) {
+			$request_url = $url;
+			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+			$response = do_post($request_url, $query_parameter_string, 80, $headers);
+		} else {
+			$request_url = $url . ($query_parameter_string ? ('?' . $query_parameter_string) : '' );
+			$response = do_get($request_url, 80, $headers);
+		}
+
+		// extract successful response
+		if (! empty($response)) {
+			list($info, $header, $body) = $response;
+			$body_parsed = oauth_parse_str($body);
+			if (! empty($body_parsed)) {
+			}
+			$retarr = $response;
+			$retarr[] = $body_parsed;
+		}
+
+		return $retarr;
 	}
 ?>
