@@ -5,7 +5,20 @@
 	include("oauth/globals.php");
 	include("oauth/oauth_helper.php");
 
-	$data = json_decode(file_get_contents("php://input"));
+	$php_input = file_get_contents("php://input");
+	$data = json_decode($php_input);
+
+	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
+	mysql_select_db($MYSQL_DATABASE);
+
+	if(count($_GET) > 0 && isset($_GET['api_key'])) {
+		if(mysql_num_rows(mysql_query("SELECT `api_key` FROM `sessions` WHERE `api_key`='" . mysql_real_escape_string($_GET['api_key']) . "';")) > 0) {
+			echo $_GET['oauth_token'] . ", " . $_GET['oauth_verifier'];
+		} else {
+			echo "Not authenticated.";
+		}
+		return;
+	}
 
 	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
 		echo alfred_error(-1);
@@ -14,9 +27,6 @@
 
 	$method = $data->method;
 	$params = $data->params;
-
-	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
-	mysql_select_db($MYSQL_DATABASE);
 
 	$ret = "";
 
@@ -420,10 +430,11 @@
 					$request_token_secret = $config['twitter_access_token_secret'];
 					$oauth_verifier = $params->verifier;
 
-					$retarr = get_access_token(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, $request_token, $request_token_secret, $oauth_verifier, false, true, true);
+					$retarr = get_access_token($TWITTER_KEY, $TWITTER_SECRET_KEY, $request_token, $request_token_secret, $oauth_verifier, false, true, true);
 					if(!empty($retarr)) {
 						list($info, $headers, $body, $body_parsed) = $retarr;
 						if($info['http_code'] == 200 && !empty($body)) {
+							mysql_query("UPDATE `configs` INNER JOIN `users` ON `configs`.`id`=`users`.`config_id` INNER JOIN `sessions` ON `sessions`.`user_id`=`users`.`id` SET `configs`.`twitter_oauth_token`='" . mysql_real_escape_string($body_parsed['oauth_token']) . "', `configs`.`twitter_oauth_token_secret`='" . mysql_real_escape_string($body_parsed['oauth_token_secret']) . "', `configs`.`twitter_screen_name`='" . mysql_real_escape_string($body_parsed['screen_name']) . "', `configs`.`twitter_user_id`='" . mysql_real_escape_string($body_parsed['user_id']) . "' WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "';");
 							$ret = alfred_result(0, array("message" => "Authentication successful."));
 						} else {
 							$ret = alfred_result(0, array("message" => "Authentication unsuccessful."));
@@ -434,22 +445,29 @@
 				}
 			}
 			break;
+		case "Net.Twitter.Tweet":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("tweet"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$config = get_config($data->key);
 
+				if(empty($config['twitter_oauth_token'])) {
+					$ret = alfred_result(0, array("message" => "Account not yet authenticated with Twitter."));
+				} else if(empty($config['twitter_access_token'])) {
+					$ret = alfred_result(0, array("message" => "You must first call Net.Twitter.StartAuth."));
+				} else {
+					$access_token = $config['twitter_oauth_token'];
+					$access_token_secret = $config['twitter_oauth_token_secret'];
+					$tweet = $params->tweet;
 
+					$retarr = post_tweet($TWITTER_KEY, $TWITTER_SECRET_KEY, $tweet, $access_token, $access_token_secret, true, true);
 
-	// Fill in the next 3 variables.
-	$request_token='c6oRe7VAIJeRLdD95b2WiTUudj73xilu36IfT2jlUEg';
-	$request_token_secret='wv7bjNW4Uds4QjH664cBeBpIyYbrPNnZZlw7hvYYQg';
-	$oauth_verifier= '0386243';
-
-	// Get the access token using HTTP GET and HMAC-SHA1 signature
-	$retarr = get_access_token(OAUTH_CONSUMER_KEY, OAUTH_CONSUMER_SECRET, $request_token, $request_token_secret, $oauth_verifier, false, true, true);
-	if (! empty($retarr)) {
-		list($info, $headers, $body, $body_parsed) = $retarr;
-		if ($info['http_code'] == 200 && !empty($body)) {
-			print "\nUse the new oauth_token and oauth_token_secret for all of your API calls\n";
-		}
-	}
+					$ret = alfred_result(0, array("message" => "Tweet sent to Twitter."));
+				}
+			}
+			break;
 		case "Net.Twitter.LastTweet":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -909,6 +927,56 @@
 			}
 			$retarr = $response;
 			$retarr[] = $body_parsed;
+		}
+
+		return $retarr;
+	}
+
+	function post_tweet($consumer_key, $consumer_secret, $status_message, $access_token, $access_token_secret, $usePost=true, $passOAuthInHeader=true)
+	{
+		$retarr = array();  // return value
+		$response = array();
+
+		$url = 'http://api.twitter.com/1/statuses/update.json';
+		$params['status'] = $status_message;
+		$params['oauth_version'] = '1.0';
+		$params['oauth_nonce'] = mt_rand();
+		$params['oauth_timestamp'] = time();
+		$params['oauth_consumer_key'] = $consumer_key;
+		$params['oauth_token'] = $access_token;
+
+		// compute hmac-sha1 signature and add it to the params list
+		$params['oauth_signature_method'] = 'HMAC-SHA1';
+		$params['oauth_signature'] =
+		oauth_compute_hmac_sig($usePost? 'POST' : 'GET', $url, $params, $consumer_secret, $access_token_secret);
+
+		// Pass OAuth credentials in a separate header or in the query string
+		if ($passOAuthInHeader) {
+			$query_parameter_string = oauth_http_build_query($params, true);
+			$header = build_oauth_header($params, "Twitter API");
+			$headers[] = $header;
+		} else {
+			$query_parameter_string = oauth_http_build_query($params);
+		}
+
+		// POST or GET the request
+		if ($usePost) {
+			$request_url = $url;
+			logit("tweet:INFO:request_url:$request_url");
+			logit("tweet:INFO:post_body:$query_parameter_string");
+			$headers[] = 'Content-Type: application/x-www-form-urlencoded';
+			$response = do_post($request_url, $query_parameter_string, 80, $headers);
+		} else {
+			$request_url = $url . ($query_parameter_string ?
+				   ('?' . $query_parameter_string) : '' );
+			logit("tweet:INFO:request_url:$request_url");
+			$response = do_get($request_url, 80, $headers);
+		}
+
+		// extract successful response
+		if (! empty($response)) {
+			list($info, $header, $body) = $response;
+			$retarr = $response;
 		}
 
 		return $retarr;

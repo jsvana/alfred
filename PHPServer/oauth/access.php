@@ -4,11 +4,12 @@ require 'globals.php';
 require 'oauth_helper.php';
 
 // Callback can either be 'oob' or a url
-$callback='http://psg.mtu.edu:21516/alfred/PHPServer/?api_key=0a3264a0c25b1456e33b807467bd8318';
+$verifier = '1143420932';
+$token = '9FAzmxVSHunsZJCZQu';
 
 // Get the request token using HTTP GET and HMAC-SHA1 signature
 $retarr = get_request_token($BITBUCKET_KEY, $BITBUCKET_SECRET_KEY,
-                            $callback, false, true, true);
+                            $verifier, $token, false, true, true);
 var_dump($retarr);
     print "https://bitbucket.org/api/1.0/oauth/authenticate/?" . rfc3986_decode($retarr);
 
@@ -24,17 +25,18 @@ exit(0);
  * @param bool $passOAuthInHeader pass OAuth credentials in HTTP header
  * @return array of response parameters or empty array on error
  */
-function get_request_token($consumer_key, $consumer_secret, $callback, $usePost=false, $useHmacSha1Sig=true, $passOAuthInHeader=false)
+function get_request_token($consumer_key, $consumer_secret, $verifier, $token, $usePost=false, $useHmacSha1Sig=true, $passOAuthInHeader=false)
 {
   $retarr = array();  // return value
   $response = array();
 
-  $url = 'https://bitbucket.org/api/1.0/oauth/request_token/';
+  $url = 'https://bitbucket.org/api/1.0/oauth/access_token/';
   $params['oauth_version'] = '1.0';
   $params['oauth_nonce'] = mt_rand();
   $params['oauth_timestamp'] = time();
   $params['oauth_consumer_key'] = $consumer_key;
-  $params['oauth_callback'] = $callback;
+  $params['oauth_verifier'] = $verifier;
+  $params['oauth_token'] = $token;
 
   // compute signature and add it to the params list
   if ($useHmacSha1Sig) {
@@ -65,6 +67,7 @@ function get_request_token($consumer_key, $consumer_secret, $callback, $usePost=
     $response = do_post($request_url, $query_parameter_string, 80, $headers);
   } else {
   	$request_url = $url . $query_str;
+	echo $request_url;
 	$ch = curl_init($request_url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	curl_setopt($ch, CURLOPT_HEADER, 'Accepts: text/json');
