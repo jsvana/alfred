@@ -284,6 +284,18 @@ Gets Bitbucket's status.
 `time (string)`, the time of the latest update  
 `description (string)`, the latest status description  
 
+### Net.FatSecret
+
+**Net.FatSecret**.***Food***
+
+Searches FatSecret for a given food.
+
+*Parameters:*  
+`food (string)`, the search string  
+
+*Returns:*  
+`foods (json)`, the returned results  
+
 ### Net.Github
 
 **Net.Github**.***Status***
@@ -310,6 +322,35 @@ Finds first movie resulting from given title
 `first_result (json)`, the first returned result  
 
 ### Net.Twitter
+
+**Net.Twitter**.***StartAuth***
+
+Initiates OAuth Twitter authorization.
+
+*Parameters:* `none`
+
+*Returns:*  
+`url (string)`, the URL to which the user must navigate to complete authorization  
+
+**Net.Twitter**.***CompleteAuth***
+
+Completes OAuth Twitter authorization.
+
+*Parameters:*  
+`verifier (string)`, the code displayed on the Net.Twitter.StartAuth URL  
+
+*Returns:*  
+`message (string)`, the status of the completed authorization  
+
+**Net.Twitter**.***Tweet***
+
+Sets a new Twitter status (tweet)
+
+*Parameters:*  
+`tweet (string)`, the new status  
+
+*Returns:*  
+`message (string)`, the status of the tweet  
 
 **Net.Twitter**.***Tweets***
 

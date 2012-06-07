@@ -274,6 +274,18 @@
 			}
 			break;
 
+		/* Net.FatSecret */
+		case "Net.FatSecret.Food":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("food"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$json = json_decode(query_fatsecret($FAT_SECRET_KEY, $FAT_SECRET_SECRET_KEY, 'foods.search', array('search_expression' => $params->food)));
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"foods\":" . json_encode($json->foods->food) . "}}";
+			}
+			break;
+
 		/* Net.Github */
 		case "Net.Github.Status":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
@@ -980,5 +992,48 @@
 		}
 
 		return $retarr;
+	}
+
+exit(0);
+
+/**
+ * Get a request token.
+ * @param string $consumer_key obtained when you registered your app
+ * @param string $consumer_secret obtained when you registered your app
+ * @param string $callback callback url can be the string 'oob'
+ * @param bool $usePost use HTTP POST instead of GET
+ * @param bool $useHmacSha1Sig use HMAC-SHA1 signature
+ * @param bool $passOAuthInHeader pass OAuth credentials in HTTP header
+ * @return array of response parameters or empty array on error
+ */
+	function query_fatsecret($consumer_key, $consumer_secret, $method, $parameters) {
+		$url = "http://platform.fatsecret.com/rest/server.api";
+		$params['format'] = 'json';
+		$params['method'] = $method;
+		$params['oauth_version'] = '1.0';
+		$params['oauth_nonce'] = mt_rand();
+		$params['oauth_timestamp'] = time();
+		$params['oauth_consumer_key'] = $consumer_key;
+		$params += $parameters;
+
+		$params['oauth_signature_method'] = 'HMAC-SHA1';
+		$params['oauth_signature'] = oauth_compute_hmac_sig('GET', $url, $params, $consumer_secret, null);
+
+		$query_str = "?";
+
+		foreach($params as $key => $value) {
+			$query_str .= $key . "=" . urlencode($value) . "&";
+		}
+
+		$query_str = substr($query_str, 0, -1);
+
+		$request_url = $url . $query_str;
+		$ch = curl_init($request_url);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, 'Accepts: text/json');
+		$response = curl_exec($ch);
+		curl_close($ch);
+
+		return $response;
 	}
 ?>

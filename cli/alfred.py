@@ -230,6 +230,30 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a Twitter command.")
 	
+	def complete_fatsecret(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['food '])
+	
+	def help_fatsecret(self):
+		print('fatsecret food <food>')
+	
+	def do_fatsecret(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == "food":
+				if len(args) < 2:
+					print("Please specify a food.")
+					return
+				(code, data) = self.request('Net.FatSecret.Food', {'food': " ".join(args[1:])})
+				if code >= 0:
+					if data['data']['foods'] == None:
+						print("No results found.")
+					else:
+						print("First result: " + data['data']['foods'][0]['food_name'] + " (" + data['data']['foods'][0]['food_description'] + ")")
+			else:
+				print("Unknown FatSecret command.")
+		else:
+			print("Please specify a FatSecret command.")
+	
 	def complete_tmdb(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['movie '])
 	

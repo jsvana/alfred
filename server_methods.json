@@ -392,6 +392,29 @@
 		]
 	},
 	{
+		"namespace" : "Net.FatSecret",
+		"methods" : [
+			{
+				"method" : "Net.FatSecret.Food",
+				"description" : "Searches FatSecret for a given food.",
+				"parameters" : [
+					{
+						"name" : "food",
+						"description" : "the search string",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "foods",
+						"description" : "the returned results",
+						"type" : "json"
+					}
+				]
+			}
+		]
+	},
+	{
 		"namespace" : "Net.Github",
 		"methods" : [
 			{
@@ -444,6 +467,54 @@
 	{
 		"namespace" : "Net.Twitter",
 		"methods" : [
+			{
+				"method" : "Net.Twitter.StartAuth",
+				"description" : "Initiates OAuth Twitter authorization.",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "url",
+						"description" : "the URL to which the user must navigate to complete authorization",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "Net.Twitter.CompleteAuth",
+				"description" : "Completes OAuth Twitter authorization.",
+				"parameters" : [
+					{
+						"name" : "verifier",
+						"description" : "the code displayed on the Net.Twitter.StartAuth URL",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "message",
+						"description" : "the status of the completed authorization",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "Net.Twitter.Tweet",
+				"description" : "Sets a new Twitter status (tweet)",
+				"parameters" : [
+					{
+						"name" : "tweet",
+						"description" : "the new status",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "message",
+						"description" : "the status of the tweet",
+						"type" : "string"
+					}
+				]
+			},
 			{
 				"method" : "Net.Twitter.Tweets",
 				"description" : "Gets the most recent tweets of the given user.",
