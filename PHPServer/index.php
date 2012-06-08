@@ -67,6 +67,29 @@
 			break;
 
 		/* Location */
+		case "Location.CheckIn":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("latitude", "longitude"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ret = alfred_result(0, array("message" => "Method not yet implemented."));
+			}
+			break;
+		case "Location.Directions":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("from", "to"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$url = "http://www.mapquestapi.com/directions/v1/route?key=" . $MAPQUEST_KEY . "&from=" . url_encode($params->from) . "&to=" . url_encode($params->to);
+				$json = json_decode(file_get_contents($url));
+
+				$directions = $json->route->legs[0]->maneuvers;
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"directions\":" . json_encode($directions) . "}}";
+			}
+			break;
 		case "Location.IPLookup":
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);

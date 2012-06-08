@@ -139,6 +139,23 @@ class Alfred(cmd.Cmd, object):
 	def do_time(self, s):
 		(code, data) = self.request('Alfred.Time')
 		if code >= 0: print(data['data']['time'])
+	
+	def help_directions(self):
+		print('directions <from> to <to>')
+	
+	def  do_directions(self, s):
+		args =  shlex.split(s)
+		if len(args) > 0:
+			if 'to' in args:
+				index = args.index('to')
+				directionsFrom = " ".join(args[0:index])
+				directionsTo = " ".join(args[(index + 1):len(args)])
+				(code, data) = self.request('Location.Directions', {'from': directionsFrom, 'to': directionsTo})
+				if code >= 0: print("\n".join(map(lambda m: m['narrative'], data['data']['directions'])))
+			else:
+				print("Invalid directions query.")
+		else:
+			print("Unknown directions command.")
 
 	def help_logout(self):
 		print('logout')

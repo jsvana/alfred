@@ -4,8 +4,8 @@ require 'globals.php';
 require 'oauth_helper.php';
 
 // Callback can either be 'oob' or a url
-$verifier = '1143420932';
-$token = '9FAzmxVSHunsZJCZQu';
+$verifier = '7941529023';
+$token = 'fTrc8EH2Ltp5cbBG7b';
 
 // Get the request token using HTTP GET and HMAC-SHA1 signature
 $retarr = get_request_token($BITBUCKET_KEY, $BITBUCKET_SECRET_KEY,
