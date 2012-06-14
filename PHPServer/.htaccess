@@ -1,0 +1,7 @@
+# check to make sure the request isn't actually for an html file
+RewriteCond %{THE_REQUEST} !^([A-Z]{3,9})\ /(.+)\.html\ HTTP
+# check to see if the html file exists (need to do this to strip off the trailing /)
+RewriteCond %{REQUEST_URI} ^/(.+)/$ 
+RewriteCond %{DOCUMENT_ROOT}/%1.html -f
+# rewrite
+RewriteRule ^(.+)/$ /$1.html [L]

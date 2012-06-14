@@ -334,6 +334,15 @@
 			}
 			break;
 
+		/* Net.Heroku */
+		case "Net.Heroku.Status":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . file_get_contents("https://status.heroku.com/api/v3/current-status") . "}";
+			}
+			break;
+
 		/* Net.TMDB */
 		case "Net.TMDB.Movie":
 			if(!session_authenticated($data->key)) {
@@ -580,7 +589,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 1 }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -827,6 +836,8 @@
 
 		curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
 		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
