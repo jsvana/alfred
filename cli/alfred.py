@@ -144,7 +144,7 @@ class Alfred(cmd.Cmd, object):
 		if len(args) == 1:
 			if args[0] == "status":
 				(code, data) = self.request('Net.Heroku.Status')
-				if code >= 0: print("Status: " + data['data']['status']['production'])
+				if code >= 0: print("Status: " + data['data']['status']['Production'])
 			else:
 				print("Unknown Heroku command.")
 		else:
