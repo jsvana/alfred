@@ -133,6 +133,23 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a Github command.")
 
+	def complete_heroku(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['status'])
+
+	def help_heroku(self):
+		print("heroku status")
+
+	def do_heroku(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			if args[0] == "status":
+				(code, data) = self.request('Net.Heroku.Status')
+				if code >= 0: print("Status: " + data['data']['status']['production'])
+			else:
+				print("Unknown Heroku command.")
+		else:
+			print("Please specify a Heroku command.")
+
 	def help_time(self):
 		print('time')
 
