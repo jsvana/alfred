@@ -6,7 +6,8 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://localhost:21516/alfred/PHPServer/"
+	url = "http://alf.re/d/"
+	#url = "http://localhost:21516/alfred/PHPServer/"
 	#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
 	#url = "http://alfred.phpfogapp.com/PHPServer/"
 	api = "0.1"
@@ -144,7 +145,7 @@ class Alfred(cmd.Cmd, object):
 		if len(args) == 1:
 			if args[0] == "status":
 				(code, data) = self.request('Net.Heroku.Status')
-				if code >= 0: print("Status: " + data['data']['status']['production'])
+				if code >= 0: print("Status: " + data['data']['status']['Production'])
 			else:
 				print("Unknown Heroku command.")
 		else:
