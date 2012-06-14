@@ -18,6 +18,12 @@
 			echo "Not authenticated.";
 		}
 		return;
+	} else if(count($_GET) > 0 && isset($_GET['code'])) {
+		if(session_authenticated($_GET['api_key'])) {
+			// Update current user config to set github_code = $_GET['code']
+		} else {
+			echo "Not authenticated.";
+		}
 	}
 
 	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
@@ -310,6 +316,13 @@
 			break;
 
 		/* Net.Github */
+		case "Net.Github.StartAuth":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$ret = alfred_result(0, array("url" => "https://github.com/login/oauth/authorize?client_id=" . $GITHUB_KEY;
+			}
+			break;
 		case "Net.Github.Status":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
