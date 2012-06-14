@@ -6,7 +6,8 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://localhost:21516/alfred/PHPServer/"
+	url = "http://alf.re/d/"
+	#url = "http://localhost:21516/alfred/PHPServer/"
 	#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
 	#url = "http://alfred.phpfogapp.com/PHPServer/"
 	api = "0.1"
