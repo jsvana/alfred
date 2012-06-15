@@ -93,6 +93,26 @@ class Alfred(cmd.Cmd, object):
 			# What? I was lazy
 			print("Please specify a server.")
 
+	def complete_sneezewatch(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['whosup', 'sneeze'])
+	
+	def help_sneezewatch(self):
+		print("sneezewatch whosup|sneeze")
+	
+	def do_sneezewatch(self, s):
+		args = shlex.split(s)
+		if len(args) >= 1:
+			if args[0] == "whosup":
+				(code, data) = self.request('Fun.SneezeWatch.WhosUp')
+				if code >= 0: print(data['data']['name'])
+			elif args[0] == "sneeze":
+				(code, data) = self.request('Fun.SneezeWatch.Sneeze')
+				if code >= 0: print(data['data']['message'])
+			else:
+				print("Unknown SneezeWatch command.")
+		else:
+			print("Please specify a SneezeWatch command.")
+
 	def complete_bitbucket(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['status', 'following'])
 

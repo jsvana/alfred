@@ -72,6 +72,40 @@
 
 			break;
 
+		/* Fun.SneezeWatch */
+		case "Fun.SneezeWatch.WhosUp":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
+
+				$ret = alfred_result(0, array("name" => $row['name']));
+			}
+			break;
+		case "Fun.SneezeWatch.Sneeze":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$names = array('Jay', 'Kaleb', 'Michael');
+				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
+				$index = array_search($row['name'], $names);
+
+				if($index) {
+					++$index;
+
+					if($index > 2) {
+						$index = 0;
+					}
+
+					mysql_query("UPDATE `sneezewatch` SET `name`='" . $names[$index] . "';");
+
+					$ret = alfred_result(0, array("message" => "New sneeze responder up."));
+				} else {
+					$ret = alfred_result(-5, array("message" => "Something went wrong with the array of sneeze responders."));
+				}
+			}
+			break;
+
 		/* Location */
 		case "Location.CheckIn":
 			if(!session_authenticated($data->key)) {
