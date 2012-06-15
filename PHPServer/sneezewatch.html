@@ -4,19 +4,31 @@
 		<title>#SneezeWatch2012</title>
 
 		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
 			p {
-				font-size: 3em;
+				position: absolute;
+				top: 50px;
+				width: 100%;
+				font-family: Arial, sans-serif;
+				font-size: 6em;
 				text-align: center;
 			}
 
 			#sneeze {
-				width: 100%;
+				width: 99%;
 				height: 300px;
+				margin: 0 10px;
 				-moz-border-radius: 10px;
 				-webkit-border-radius: 10px;
 				border-radius: 10px;
 				border: 3px solid #9e0d0d;
 				background-color: #eb1010;
+				position: absolute;
+				bottom: 10px;
 				font-size: 4em;
 			}
 
@@ -42,12 +54,8 @@
 					success: function(json) {
 						if(json.data.key) {
 							apiKey = json.data.key;
-							$.ajax({
-								data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
-								success: function(json) {
-									$("#whosup").html(json.data.name);
-								}
-							});
+
+							updateResponder();
 						}
 					}
 				});
@@ -71,16 +79,21 @@
 					$.ajax({
 						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.Sneeze","params":{}}',
 						success: function(json) {
-							$.ajax({
-								data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
-								success: function(json) {
-									$("#whosup").html(json.data.name);
-								}
-							});
+							$("#whosup").html(json.data.name);
 						}
 					});
 				}
 			});
+			
+			function updateResponder() {
+				$.ajax({
+					data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
+					success: function(json) {
+						$("#whosup").html(json.data.name);
+						setTimeout("updateResponder()", 5000);
+					}
+				});
+			}
 		</script>
 	</head>
 	<body>
