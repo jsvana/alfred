@@ -6,7 +6,6 @@
 	include("oauth/oauth_helper.php");
 
 	$php_input = file_get_contents("php://input");
-	echo $php_input;
 	$data = json_decode($php_input);
 
 	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
@@ -48,7 +47,7 @@
 
 				$result = mysql_query("SELECT `id` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';");
 
-				if($result) {
+				if(mysql_num_rows($result) > 0) {
 					$row = mysql_fetch_assoc($result);
 					$userID = $row['id'];
 					$key = md5($username . $password . time());
@@ -87,7 +86,7 @@
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				$names = array('Jay', 'Kaleb', 'Michael');
+				$names = array('Swarhili', 'MrBelak', 'Julie');
 				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
 				$index = array_search($row['name'], $names);
 
@@ -102,7 +101,7 @@
 
 					mysql_query("UPDATE `sneezewatch` SET `name`='" . $names[$index] . "';");
 
-					$ret = alfred_result(0, array("message" => "New sneeze responder up."));
+					$ret = alfred_result(0, array("name" => $names[$index]));
 				}
 			}
 			break;

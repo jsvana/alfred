@@ -107,7 +107,7 @@ class Alfred(cmd.Cmd, object):
 				if code >= 0: print(data['data']['name'])
 			elif args[0] == "sneeze":
 				(code, data) = self.request('Fun.SneezeWatch.Sneeze')
-				if code >= 0: print(data['data']['message'])
+				if code >= 0: print(data['data']['name'] + " is now up.")
 			else:
 				print("Unknown SneezeWatch command.")
 		else:
