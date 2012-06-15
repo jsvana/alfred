@@ -6,6 +6,7 @@
 	include("oauth/oauth_helper.php");
 
 	$php_input = file_get_contents("php://input");
+	echo $php_input;
 	$data = json_decode($php_input);
 
 	mysql_connect($MYSQL_HOSTNAME, $MYSQL_USERNAME, $MYSQL_PASSWORD);
@@ -90,7 +91,9 @@
 				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
 				$index = array_search($row['name'], $names);
 
-				if($index) {
+				if($index === false) {
+					$ret = alfred_result(-5, array("message" => "Something went wrong with the array of sneeze responders."));
+				} else {
 					++$index;
 
 					if($index > 2) {
@@ -100,8 +103,6 @@
 					mysql_query("UPDATE `sneezewatch` SET `name`='" . $names[$index] . "';");
 
 					$ret = alfred_result(0, array("message" => "New sneeze responder up."));
-				} else {
-					$ret = alfred_result(-5, array("message" => "Something went wrong with the array of sneeze responders."));
 				}
 			}
 			break;
@@ -354,7 +355,7 @@
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				$ret = alfred_result(0, array("url" => "https://github.com/login/oauth/authorize?client_id=" . $GITHUB_KEY;
+				$ret = alfred_result(0, array("url" => "https://github.com/login/oauth/authorize?client_id=" . $GITHUB_KEY));
 			}
 			break;
 		case "Net.Github.Status":

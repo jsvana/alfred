@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Alfred Dictation</title>
+		
+		<style>
+			#searchContainer {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -300px;
+				margin-top: -300px;
+				width: 600px;
+				height: 600px;
+			}
+		</style>
+
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script>
+			var apiKey = "";
+
+			$(function() {
+				$.ajaxSetup({
+					url: 'http://alf.re/d/',
+					type: 'post',
+					dataType: 'json'
+				});
+
+				$.ajax({
+					data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
+					success: function(json) {
+						if(json.data.key) {
+							apiKey = json.data.key;
+							$.ajax({
+								data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
+								success: function(json) {
+									$("#whosup").html(json.data.name);
+								}
+							});
+						}
+					}
+				});
+
+				$('#sneeze').on('click', function() {
+					if(apiKey === "") {
+						return;
+					}
+
+					$.ajax({
+						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.Sneeze","params":{}}',
+						success: function(json) {
+							$.ajax({
+								data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
+								success: function(json) {
+									$("#whosup").html(json.data.name);
+								}
+							});
+						}
+					});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="searchContainer">
+			<p id="whosup"></p>
+			<input type="button" id="sneeze" value="SNEEZE">
+		</div>
+	</body>
+</html>
