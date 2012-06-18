@@ -271,7 +271,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("motd" => $result['motd']));
@@ -288,7 +288,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("players" => $result['players']));
@@ -305,7 +305,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("maxPlayers" => $result['maxPlayers']));
