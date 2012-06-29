@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>#SneezeWatch2012</title>
+
+		<style>
+			body {
+				margin: 0;
+				padding: 0;
+			}
+
+			p {
+				position: absolute;
+				top: 50px;
+				width: 100%;
+				font-family: Arial, sans-serif;
+				font-size: 6em;
+				text-align: center;
+			}
+
+			#sneeze {
+				width: 99%;
+				height: 300px;
+				margin: 0 10px;
+				-moz-border-radius: 10px;
+				-webkit-border-radius: 10px;
+				border-radius: 10px;
+				border: 3px solid #9e0d0d;
+				background-color: #eb1010;
+				position: absolute;
+				bottom: 10px;
+				font-size: 4em;
+			}
+
+			#sneeze:hover {
+				cursor: pointer;
+				background-color: #eb3131;
+			}
+		</style>
+		
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script>
+			var apiKey = "";
+
+			$(function() {
+				$.ajaxSetup({
+					url: 'http://alf.re/d/',
+					type: 'post',
+					dataType: 'json'
+				});
+
+				$.ajax({
+					data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
+					success: function(json) {
+						if(json.data.key) {
+							apiKey = json.data.key;
+
+							updateResponder();
+						}
+					}
+				});
+
+				$('#sneeze').on('click', function() {
+					respond();
+				});
+				
+				$(document).on('keydown', function(e) {
+					if(e.which === 13) {
+						respond();
+						e.preventDefault();
+					}
+				});
+
+				function respond() {
+					if(apiKey === "") {
+						return;
+					}
+
+					$.ajax({
+						data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.Sneeze","params":{}}',
+						success: function(json) {
+							$("#whosup").html(json.data.name);
+						}
+					});
+				}
+			});
+			
+			function updateResponder() {
+				$.ajax({
+					data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Fun.SneezeWatch.WhosUp","params":{}}',
+					success: function(json) {
+						$("#whosup").html(json.data.name);
+						setTimeout("updateResponder()", 5000);
+					}
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<p id="whosup"></p>
+		<input type="button" value="FARKLE" id="sneeze">
+	</body>
+</html>

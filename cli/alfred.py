@@ -6,7 +6,8 @@ class Alfred(cmd.Cmd, object):
 	# TODO: set strings to format documentation
 	prompt = "> "
 	apikey = ""
-	url = "http://localhost:21516/alfred/PHPServer/"
+	url = "http://alf.re/d/"
+	#url = "http://localhost:21516/alfred/PHPServer/"
 	#url = "http://psg.mtu.edu:21516/alfred/PHPServer/"
 	#url = "http://alfred.phpfogapp.com/PHPServer/"
 	api = "0.1"
@@ -14,7 +15,7 @@ class Alfred(cmd.Cmd, object):
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = False
+	debug = True
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
@@ -92,6 +93,26 @@ class Alfred(cmd.Cmd, object):
 			# What? I was lazy
 			print("Please specify a server.")
 
+	def complete_sneezewatch(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['whosup', 'sneeze'])
+	
+	def help_sneezewatch(self):
+		print("sneezewatch whosup|sneeze")
+	
+	def do_sneezewatch(self, s):
+		args = shlex.split(s)
+		if len(args) >= 1:
+			if args[0] == "whosup":
+				(code, data) = self.request('Fun.SneezeWatch.WhosUp')
+				if code >= 0: print(data['data']['name'])
+			elif args[0] == "sneeze":
+				(code, data) = self.request('Fun.SneezeWatch.Sneeze')
+				if code >= 0: print(data['data']['name'] + " is now up.")
+			else:
+				print("Unknown SneezeWatch command.")
+		else:
+			print("Please specify a SneezeWatch command.")
+
 	def complete_bitbucket(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['status', 'following'])
 
@@ -132,6 +153,23 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Github command.")
 		else:
 			print("Please specify a Github command.")
+
+	def complete_heroku(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['status'])
+
+	def help_heroku(self):
+		print("heroku status")
+
+	def do_heroku(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			if args[0] == "status":
+				(code, data) = self.request('Net.Heroku.Status')
+				if code >= 0: print("Status: " + data['data']['status']['Production'])
+			else:
+				print("Unknown Heroku command.")
+		else:
+			print("Please specify a Heroku command.")
 
 	def help_time(self):
 		print('time')
@@ -203,6 +241,31 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown password command.")
 		else:
 			print("Unknown password command.")
+
+	def complete_tasks(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['list', 'add'])
+	
+	def help_tasks(self):
+		print("tasks list")
+		print("tasks add <task>")
+	
+	def do_tasks(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == "list":
+				(code, data) = self.request('Tasks.List')
+				if code >= 0:
+					print('\n'.join(map(lambda t: t['task'], data['data']['tasks'])))
+			elif args[0] == "add":
+				if len(args) < 2:
+					print("Please provide a task to add.")
+					return
+				(code, data) = self.request('Tasks.Add', {'task': " ".join(args[1:])})
+				if code >= 0: print(data['data']['message'])
+			else:
+				print("Unknown tasks command.")
+		else:
+			print("Please specify a tasks command.")
 
 	def complete_twitter(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['last', 'tweet', 'tweets', 'startauth', 'completeauth'])

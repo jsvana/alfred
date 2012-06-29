@@ -18,6 +18,12 @@
 			echo "Not authenticated.";
 		}
 		return;
+	} else if(count($_GET) > 0 && isset($_GET['code'])) {
+		if(session_authenticated($_GET['api_key'])) {
+			// Update current user config to set github_code = $_GET['code']
+		} else {
+			echo "Not authenticated.";
+		}
 	}
 
 	if(!isset($data) || !isset($data->alfred) || !isset($data->key) || !isset($data->method) || !isset($data->params)) {
@@ -41,7 +47,7 @@
 
 				$result = mysql_query("SELECT `id` FROM `users` WHERE `username`='" . mysql_real_escape_string($username) . "' AND `password`='" . md5($password) . "';");
 
-				if($result) {
+				if(mysql_num_rows($result) > 0) {
 					$row = mysql_fetch_assoc($result);
 					$userID = $row['id'];
 					$key = md5($username . $password . time());
@@ -64,6 +70,59 @@
 		case "Alfred.Time":
 			$ret = alfred_result(0, array("time" => date("Y-m-d H:i:s \G\M\TP")));
 
+			break;
+
+		/* Fun.MLF */
+		case "Fun.MLF.Rules":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				// fetch rules from mysql
+				//$row = 
+			}
+			break;
+		case "Fun.MLF.AddRule":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("rule"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				// add rule to mysql
+			}
+			break;
+
+		/* Fun.SneezeWatch */
+		case "Fun.SneezeWatch.WhosUp":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
+
+				$ret = alfred_result(0, array("name" => $row['name']));
+			}
+			break;
+		case "Fun.SneezeWatch.Sneeze":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$names = array('Swarhili', 'MrBelak', 'Julie');
+				$row = mysql_fetch_assoc(mysql_query("SELECT `name` FROM `sneezewatch` LIMIT 1;"));
+				$index = array_search($row['name'], $names);
+
+				if($index === false) {
+					$ret = alfred_result(-5, array("message" => "Something went wrong with the array of sneeze responders."));
+				} else {
+					++$index;
+
+					if($index > 2) {
+						$index = 0;
+					}
+
+					mysql_query("UPDATE `sneezewatch` SET `name`='" . $names[$index] . "';");
+
+					$ret = alfred_result(0, array("name" => $names[$index]));
+				}
+			}
 			break;
 
 		/* Location */
@@ -231,7 +290,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("motd" => $result['motd']));
@@ -248,7 +307,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("players" => $result['players']));
@@ -265,7 +324,7 @@
 				if(count($serverArr) === 1) {
 					$result = minecraft_ping($serverArr[0]);
 				} else {
-					$result = minecraft_ping($serverArr[1]);
+					$result = minecraft_ping($serverArr[0], $serverArr[1]);
 				}
 
 				$ret = alfred_result(0, array("maxPlayers" => $result['maxPlayers']));
@@ -310,6 +369,13 @@
 			break;
 
 		/* Net.Github */
+		case "Net.Github.StartAuth":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$ret = alfred_result(0, array("url" => "https://github.com/login/oauth/authorize?client_id=" . $GITHUB_KEY));
+			}
+			break;
 		case "Net.Github.Status":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -331,6 +397,15 @@
 				$date = $json->last_updated;
 
 				$ret = alfred_result(0, array("time" => $date, "description" => $status));
+			}
+			break;
+
+		/* Net.Heroku */
+		case "Net.Heroku.Status":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . file_get_contents("https://status.heroku.com/api/v3/current-status") . "}";
 			}
 			break;
 
@@ -560,6 +635,33 @@
 			}
 			break;
 
+		/* Tasks */
+		case "Tasks.List":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$result = mysql_query("SELECT `tasks`.* FROM `tasks`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' `tasks`.`user_id`=`sessions`.`user_id`;");
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"tasks\":[";
+
+				while($row = mysql_fetch_assoc($result)) {
+					$ret .= "{\"id\":" . $row['id'] . ",\"task\":\"" . $row['task'] . "\",\"complete\":\"" . $row['complete'] . "\"}";
+				}
+
+				$ret .= "]}";
+			}
+			break;
+		case "Tasks.Add":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("task"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				mysql_query("INSERT INTO tasks (task, complete, user_id) VALUES ('" . mysql_real_escape_string($params->task) . "', 'f', (SELECT user_id FROM sessions WHERE api_key='" . mysql_real_escape_string($data->key) . "' LIMIT 1));");
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"message\":\"Added task.\"}}";
+			}
+			break;
+
 		/* System */
 		case "System.Introspect":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
@@ -580,7 +682,7 @@
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 0 }, \"id\": 1}");
+				xbmc_request("{\"jsonrpc\": \"2.0\", \"method\": \"Player.PlayPause\", \"params\": { \"playerid\": 1 }, \"id\": 1}");
 
 				$ret = alfred_result(0, array("message" => "Command sent."));
 			}
@@ -827,6 +929,8 @@
 
 		curl_setopt($ch, CURLOPT_URL, "http://" . $XBMC_USERNAME . ":" . $XBMC_PASSWORD . "@" . $XBMC_HOST . ":" . $XBMC_PORT . "/jsonrpc");
 		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 

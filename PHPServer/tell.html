@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Alfred Dictation</title>
+		
+		<style>
+			#searchContainer {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				margin-left: -300px;
+				margin-top: -300px;
+				width: 600px;
+				height: 600px;
+				border: 1px solid #000;
+			}
+		</style>
+
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script>
+			var apiKey = "";
+
+			$(function() {
+				$.ajaxSetup({
+					url: 'http://alf.re/d/',
+					type: 'post',
+					dataType: 'json'
+				});
+
+				$('#speech').on('propertychange keyup input paste', function() {
+					var command = $('#speech').val();
+
+					var args = command.split(" ");
+					command = args.shift();
+
+					switch(command) {
+						case 'login':
+							$.ajax({
+								data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
+								success: function(json) {
+									if(json.data.key) {
+										apiKey = json.data.key;
+										$('#output').html('Login successful.');
+										$('#speech').val('');
+									} else {
+										$('#output').html('Login unsuccessful.');
+										$('#speech').val('');
+									}
+								}
+							});
+							break;
+						case 'xbmc':
+							if(args.length > 0) {
+								switch(args[0]) {
+									case 'stop':
+										$.ajax({
+											data: '{"alfred":"0.1","key":"' + apiKey + '","method":"XBMC.Pause","params":{}}',
+											success: function(data) {
+												$('#output').html(data.data.message);
+												$('#speech').val('');
+											}
+										});
+										break;
+									default:
+										$('#output').html('Unknown XBMC command.');
+										$('#speech').val('');
+										break;
+								}
+							} else {
+								$('#output').html('Please specify an XBMC command.');
+								$('#speech').val('');
+							}
+							break;
+						case 'weather':
+							$.ajax({
+								data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Location.Weather","params":{}}',
+								success: function(data) {
+									$('#output').html('Weather for ' + data.data.location + ', as of ' + data.data.date + ': ' + data.data.temp + '\u00b0C, ' + data.data.text);
+								$('#speech').val('');
+								}
+							});
+							break;
+						default:
+							$('#output').html('Unknown command.');
+							$('#speech').val('');
+							break;
+					}
+							
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="searchContainer">
+			<input type="text" id="speech" x-webkit-speech speech required style="width:570px;margin:10px;">
+			<span id="output" style="padding:10px"></span>
+		</div>
+	</body>
+</html>
