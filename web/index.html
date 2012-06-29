@@ -42,7 +42,7 @@
 						});
 
 						$.ajax({
-							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Minecraft.Players","params":{"server":"keepcraft.in:21516"}}',
+							data: '{"alfred":"0.1","key":"' + apiKey + '","method":"Minecraft.Players","params":{"server":"keepcraft.in"}}',
 							success: function(text) {
 								var count = parseInt(text.data.players);
 								$('#minecraft_players').html("There " + (count == 1 ? "is" : "are") + " currently " + text.data.players + " player" + (count == 1 ? "" : "s") + " on keepcraft.in.")

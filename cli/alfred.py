@@ -15,7 +15,7 @@ class Alfred(cmd.Cmd, object):
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = False
+	debug = True
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
@@ -241,6 +241,31 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown password command.")
 		else:
 			print("Unknown password command.")
+
+	def complete_tasks(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['list', 'add'])
+	
+	def help_tasks(self):
+		print("tasks list")
+		print("tasks add <task>")
+	
+	def do_tasks(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == "list":
+				(code, data) = self.request('Tasks.List')
+				if code >= 0:
+					print('\n'.join(map(lambda t: t['task'], data['data']['tasks'])))
+			elif args[0] == "add":
+				if len(args) < 2:
+					print("Please provide a task to add.")
+					return
+				(code, data) = self.request('Tasks.Add', {'task': " ".join(args[1:])})
+				if code >= 0: print(data['data']['message'])
+			else:
+				print("Unknown tasks command.")
+		else:
+			print("Please specify a tasks command.")
 
 	def complete_twitter(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['last', 'tweet', 'tweets', 'startauth', 'completeauth'])

@@ -72,6 +72,25 @@
 
 			break;
 
+		/* Fun.MLF */
+		case "Fun.MLF.Rules":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				// fetch rules from mysql
+				//$row = 
+			}
+			break;
+		case "Fun.MLF.AddRule":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("rule"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				// add rule to mysql
+			}
+			break;
+
 		/* Fun.SneezeWatch */
 		case "Fun.SneezeWatch.WhosUp":
 			if(!session_authenticated($data->key)) {
@@ -613,6 +632,33 @@
 				} else {
 					$ret = alfred_error(-3, array("message" => "Site not in database."));
 				}
+			}
+			break;
+
+		/* Tasks */
+		case "Tasks.List":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$result = mysql_query("SELECT `tasks`.* FROM `tasks`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' `tasks`.`user_id`=`sessions`.`user_id`;");
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"tasks\":[";
+
+				while($row = mysql_fetch_assoc($result)) {
+					$ret .= "{\"id\":" . $row['id'] . ",\"task\":\"" . $row['task'] . "\",\"complete\":\"" . $row['complete'] . "\"}";
+				}
+
+				$ret .= "]}";
+			}
+			break;
+		case "Tasks.Add":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("task"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				mysql_query("INSERT INTO tasks (task, complete, user_id) VALUES ('" . mysql_real_escape_string($params->task) . "', 'f', (SELECT user_id FROM sessions WHERE api_key='" . mysql_real_escape_string($data->key) . "' LIMIT 1));");
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"message\":\"Added task.\"}}";
 			}
 			break;
 
