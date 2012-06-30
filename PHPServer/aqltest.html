@@ -26,17 +26,14 @@
             return;
           }
 
-          $.ajax({
-            data: parseAQL($("#input").val(), apiKey),
-            success: function(data) {
-              console.log(data);
-            }
-          });
+          query($("#input").val(), apiKey, function(data) {
+            console.log(data);
+          }
         });
       });
     </script>
   </head>
   <body>
-    <input type="text" id="input">
+    <textarea id="input"></textarea>
     <button id="query">Query</button>
 </html>

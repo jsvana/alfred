@@ -219,7 +219,23 @@ var parseAQL = function(command, apiKey) {
 
     alfredStr += '}}';
 
-    return alfredStr;
+    return { query: alfredStr, returns: query.fields };
+};
+
+var query = function(command, apiKey, callback) {
+    var req = parseAQL(command, apiKey);
+
+    $.ajax({
+        data: res.query,
+        success: function(data) {
+            var ret = {};
+            for(var i = 0; i < req.fields.length; i++) {
+                ret[req.fields[i]] = data.data[req.fields[i]];
+            }
+
+            callback(ret);
+        }
+    });
 };
 
 //lg(alfredStr);
