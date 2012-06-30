@@ -205,7 +205,20 @@ var parseAQL = function(command, apiKey) {
 
     var methods = {
         weather: 'Location.Weather',
-        directions: 'Location.Directions'
+        directions: 'Location.Directions',
+				iplookup: 'Location.IPLookup',
+				minecraft_motd: 'Minecraft.MOTD',
+				minecraft_players: 'Minecraft.Players',
+				minecraft_maxplayers: 'Minecraft.MaxPlayers',
+				bitbucket_status: 'Net.Bitbucket.Status',
+				github_status: 'Net.Github.Status',
+				heroku_status: 'Net.Heroku.Status',
+				movie: 'Net.TMDB.Movie',
+				ping: 'Net.Ping',
+				dns: 'Net.DNS',
+				shorten: 'Net.Shorten',
+				lmgtfy: 'Net.LMGTFY',
+				tasks: 'Tasks.List'
     };
 
     var alfredStr = '{"alfred":"0.1","key":"' + apiKey + '","method":"' + methods[query.table] + '","params":{';
