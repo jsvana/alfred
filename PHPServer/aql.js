@@ -226,7 +226,7 @@ var query = function(command, apiKey, callback) {
     var req = parseAQL(command, apiKey);
 
     $.ajax({
-        data: res.query,
+        data: req.query,
         success: function(data) {
             var ret = {};
             for(var i = 0; i < req.fields.length; i++) {
