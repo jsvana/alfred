@@ -8,11 +8,16 @@
       var apiKey = '';
 
       $(function() {
-        $.ajax({
+        $.ajaxSetup({
           url: 'http://alf.re/d/',
           type: 'post',
+          dataType: 'json'
+        });
+
+        $.ajax({
           data: '{"alfred":"0.1","method":"Alfred.Login","params":{"username":"jsvana","password":"iorTk3QFcm"}}',
           success: function(data) {
+            console.log(data);
             apiKey = data.data.key;
           }
         });
@@ -22,8 +27,6 @@
           }
 
           $.ajax({
-            url: 'http://alf.re/d/',
-            type: 'post',
             data: parseAQL($("#input").val(), apiKey),
             success: function(data) {
               console.log(data);
