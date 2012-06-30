@@ -229,8 +229,8 @@ var query = function(command, apiKey, callback) {
         data: req.query,
         success: function(data) {
             var ret = {};
-            for(var i = 0; i < req.fields.length; i++) {
-                ret[req.fields[i]] = data.data[req.fields[i]];
+            for(var i = 0; i < req.returns.length; i++) {
+                ret[req.returns[i]] = data.data[req.returns[i]];
             }
 
             callback(ret);
