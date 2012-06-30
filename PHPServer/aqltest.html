@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>AQL Test</title>
+    <script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script src="aql.js"></script>
+    <script>
+      var apiKey = '';
+
+      $(function() {
+        $.ajax({
+          url: 'http://alf.re/d/',
+          type: 'post',
+          data: '{"alfred":"0.1","method":"Alfred.Login","params":{"username":"jsvana","password":"iorTk3QFcm"}}',
+          success: function(data) {
+            apiKey = data.data.key;
+          }
+        });
+        $("#query").on('click', function() {
+          if($("#input").val() === '') {
+            return;
+          }
+
+          $.ajax({
+            url: 'http://alf.re/d/',
+            type: 'post',
+            data: parseAQL($("#input").val(), apiKey),
+            success: function(data) {
+              console.log(data);
+            }
+          });
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <input type="text" id="input">
+    <button id="query">Query</button>
+</html>
