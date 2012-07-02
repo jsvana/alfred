@@ -15,7 +15,7 @@
         });
 
         $.ajax({
-          data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"jsvana","password":"iorTk3QFcm"}}',
+          data: '{"alfred":"0.1","key":"","method":"Alfred.Login","params":{"username":"guest","password":"hunter2"}}',
           success: function(data) {
             console.log(data);
             apiKey = data.data.key;
@@ -27,7 +27,11 @@
           }
 
           query($("#input").val(), apiKey, function(data) {
-            console.log(data);
+						$("#result").html('');
+
+						for(var key in data) {
+							$("#result").append(key + ": " + data[key] + "<br>");
+						}
           });
         });
       });
@@ -36,4 +40,5 @@
   <body>
     <textarea id="input"></textarea>
     <button id="query">Query</button>
+		<div id="result"></div>
 </html>
