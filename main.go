@@ -5,7 +5,10 @@ import (
 	"unicode/utf8"
 	"strings"
 	"regexp"
+	"encoding/json"
 )
+
+type Result []Token
 
 const (
 	AQL_STR = iota
@@ -17,6 +20,14 @@ const (
 	VAR_DELIMITER = "`"
 	FUNCTION_PARENS = "()"
 )
+
+// The extra `json:` crap is to make sure it gets lower cased
+type Response struct {
+	Alfred string				`json:"alfred"`
+	Key string					`json:"key"`
+	Method string				`json:"method"`
+	Params map[string]string	`json:"params"`
+}
 
 type Token struct {
 	Text string
@@ -31,7 +42,7 @@ type Param struct {
 type Query struct {
 	Table string
 	Fields []string
-	Where []Param
+	Where map[string]string
 }
 
 func lg(str string) {
@@ -111,31 +122,26 @@ func niceString(str string) (ret string) {
 	return
 }
 
-func addToken(tokens []Token, tokText string, tokType int) ([]Token) {
-	var t Token
-	t.Type = tokType
-	t.Text = tokText
-	return append(tokens, t)
+func (r *Result) addToken(tokText string, tokType int) {
+	*r = append(*r, Token{Type: tokType, Text: tokText})
 }
 
-func nextToken(tokens []Token) (Token, []Token) {
-	return tokens[0], tokens[1:]
+func (r *Result) nextToken() (Token) {
+	ret := (*r)[0]
+	*r = (*r)[1:]
+	return ret
 }
 
-func peekToken(tokens []Token) (Token) {
-	return tokens[0]
+func (r *Result) peekToken() (Token) {
+	return (*r)[0]
 }
 
-func hasNextToken(tokens []Token) (bool) {
-	return len(tokens) != 0
+func (t *Result) hasNextToken() (bool) {
+	return len(*t) != 0
 }
 
-func tokenCount(tokens []Token) (int) {
-	return len(tokens)
-}
-
-func tokenTextEq(token Token, text string) (bool) {
-	return token.Text == text || strings.ToLower(token.Text) == text
+func (t *Token) tokenTextEq(text string) (bool) {
+	return t.Text == text || strings.ToLower(t.Text) == text
 }
 
 func parseAQL(command string, apiKey string) (string, []string) {
@@ -161,8 +167,9 @@ func parseAQL(command string, apiKey string) (string, []string) {
         "tasks": "Tasks.List",
 	}
 
-	var tokens []Token
+	var tokens Result
 	var query Query
+	query.Where = make(map[string]string)
 
 	for (len(input) > 0) {
 		tokText := ""
@@ -172,7 +179,7 @@ func parseAQL(command string, apiKey string) (string, []string) {
 			_, input = nextChar(input)
 		} else if (isOper(peekChar(input))) {
 			tokText, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_OP)
+			tokens.addToken(tokText, AQL_OP)
 		} else if (peekChar(input) == VAR_DELIMITER) {
 			_, input = nextChar(input)
 
@@ -183,7 +190,7 @@ func parseAQL(command string, apiKey string) (string, []string) {
 			}
 
 			_, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_FIELD)
+			tokens.addToken(tokText, AQL_FIELD)
 		} else if (peekChar(input) == "'") {
 			_, input = nextChar(input)
 
@@ -194,7 +201,7 @@ func parseAQL(command string, apiKey string) (string, []string) {
 			}
 
 			_, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_ARG)
+			tokens.addToken(tokText, AQL_ARG)
 		} else {
 			for (len(input) > 0 && isValidChar(peekChar(input))) {
 				var n string
@@ -210,90 +217,82 @@ func parseAQL(command string, apiKey string) (string, []string) {
 			}
 
 			if (contains(keywords, tokText) || contains(keywords, strings.ToLower(tokText))) {
-				tokens = addToken(tokens, tokText, AQL_KEYWD)
+				tokens.addToken(tokText, AQL_KEYWD)
 			} else {
-				tokens = addToken(tokens, tokText, tokType)
+				tokens.addToken(tokText, tokType)
 			}
 		}
 	}
 
-	for (hasNextToken(tokens)) {
-		var token Token
-		token, tokens = nextToken(tokens)
+	for (tokens.hasNextToken()) {
+		token := tokens.nextToken()
 
-		if (token.Type == AQL_KEYWD && tokenTextEq(token, "select")) {
-			for hasNextToken(tokens) {
+		if (token.Type == AQL_KEYWD && token.tokenTextEq("select")) {
+			for tokens.hasNextToken() {
 				var nToken Token
-				nToken, tokens = nextToken(tokens)
+				nToken = tokens.nextToken()
 				query.Fields = append(query.Fields, nToken.Text)
-				if (peekToken(tokens).Type != AQL_KEYWD) {
-					_, tokens = nextToken(tokens)
+				if (tokens.peekToken().Type != AQL_KEYWD) {
+					tokens.nextToken()
 				} else {
 					break
 				}
 			}
-		} else if (token.Type == AQL_KEYWD && tokenTextEq(token, "from")) {
+		} else if (token.Type == AQL_KEYWD && token.tokenTextEq("from")) {
 			var nToken Token
-			nToken, tokens = nextToken(tokens)
+			nToken = tokens.nextToken()
 			query.Table = nToken.Text
-		} else if (token.Type == AQL_KEYWD && tokenTextEq(token, "where")) {
-			for hasNextToken(tokens) {
-				peek := peekToken(tokens)
+		} else if (token.Type == AQL_KEYWD && token.tokenTextEq("where")) {
+			for tokens.hasNextToken() {
+				peek := tokens.peekToken()
 
 				if (peek.Type == AQL_OP && peek.Text == ";") {
-					_, tokens = nextToken(tokens)
+					tokens.nextToken()
 					break
-				} else if (tokenCount(tokens) > 5) {
+				} else if (len(tokens) > 5) {
 					var param Token
 					var next Token
-					param, tokens = nextToken(tokens)
-					_, tokens = nextToken(tokens)
-					next, tokens = nextToken(tokens)
+					param = tokens.nextToken()
+					tokens.nextToken()
+					next = tokens.nextToken()
 
 					if (next.Type == AQL_FUNC && next.Text == "me") {
-						_, tokens = nextToken(tokens)
-						_, tokens = nextToken(tokens)
+						tokens.nextToken()
+						tokens.nextToken()
 
-						peek = peekToken(tokens)
+						peek = tokens.peekToken()
 
 						if (peek.Type == AQL_KEYWD && peek.Text == "and") {
-							_, tokens = nextToken(tokens)
+							tokens.nextToken()
 						} else if (peek.Type == AQL_OP && peek.Text == ";") {
-							_, tokens = nextToken(tokens)
+							tokens.nextToken()
 							break
 						}
 					} else {
-						var p Param
-						p.Key = param.Text
-						p.Value = next.Text
-						query.Where = append(query.Where, p)
+						query.Where[param.Text] = next.Text
 
-						peek = peekToken(tokens)
+						peek = tokens.peekToken()
 
-						if (peek.Type == AQL_KEYWD && tokenTextEq(peek, "and")) {
-							_, tokens = nextToken(tokens)
+						if (peek.Type == AQL_KEYWD && peek.tokenTextEq("and")) {
+							tokens.nextToken()
 						} else if (peek.Type == AQL_OP && peek.Text == ";") {
-							_, tokens = nextToken(tokens)
+							tokens.nextToken()
 						}
 					}
-				} else if (tokenCount(tokens) > 3) {
+				} else if (len(tokens) > 3) {
 					var param Token
 					var next Token
-					var p Param
 
-					param, tokens = nextToken(tokens)
-					_, tokens = nextToken(tokens)
-					next, tokens = nextToken(tokens)
+					param = tokens.nextToken()
+					tokens.nextToken()
+					next = tokens.nextToken()
 
-					p.Key = param.Text
-					p.Value = next.Text
+					query.Where[param.Text] = next.Text
 
-					query.Where = append(query.Where, p)
-
-					if (peek.Type == AQL_KEYWD && tokenTextEq(peek, "and")) {
-						_, tokens = nextToken(tokens)
+					if (peek.Type == AQL_KEYWD && peek.tokenTextEq("and")) {
+						tokens.nextToken()
 					} else if (peek.Type == AQL_OP && peek.Text == ";") {
-						_, tokens = nextToken(tokens)
+						tokens.nextToken()
 						break
 					}
 				} else {
@@ -303,19 +302,13 @@ func parseAQL(command string, apiKey string) (string, []string) {
 		}
 	}
 
-	alfredStr := "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"" + methods[query.Table] + "\",\"params\":{"
+	alfredStr, _ := json.Marshal(Response{Alfred: "0.1", Key: apiKey, Method: methods[query.Table], Params: query.Where})
 
-	for _, p := range(query.Where) {
-		alfredStr += "\"" + p.Key + "\":\"" + p.Value + "\","
-	}
-
-	alfredStr = alfredStr[0:len(alfredStr) - 1] + "}}"
-
-	return alfredStr, query.Fields
+	return string(alfredStr), query.Fields
 }
 
 func main() {
-	command := "SELECT `location` FROM `weather stuff` WHERE `zip`='48195';"
+	command := "SELECT `location` FROM `weather` WHERE `zip`='48195';"
 	fmt.Println("in:", command)
 	out, returns := parseAQL(command, "")
 	fmt.Println("out:", out)
