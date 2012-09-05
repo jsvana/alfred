@@ -15,7 +15,7 @@ class Alfred(cmd.Cmd, object):
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = True
+	debug = False
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
@@ -381,11 +381,28 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a location.")
 
+	def help_mtu(self):
+		print('mtu food|wmtu')
+
+	def do_mtu(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == 'food':
+				(code, data) = self.request('MTU.Dining')
+				if code >= 0: print("Breakfast:\n" + data['data']['breakfast'] + "\nLunch:\n" + data['data']['lunch'] + "\nDinner:\n" + data['data']['dinner'])
+			elif args[0] == 'wmtu':
+				(code, data) = self.request('MTU.WMTU')
+				if code >= 0: print("As of " + data['data']['date'] + "\nSong: " + data['data']['song'] + "\nArtist: " + data['data']['artist'] + "\nAlbum: " + data['data']['album'])
+			else:
+				print('Unknown MTU command')
+		else:
+			print('Please specify a command')
+
 	def help_iplookup(self):
 		print('iplookup <ip>')
 	
 	def do_iplookup(self, s):
-		args  = shlex.split(s)
+		args = shlex.split(s)
 		if len(args) > 0:
 			(code, data) = self.request('Location.IPLookup', {'ip': args[0]})
 			if code >= 0: print("Location: " + data['data']['cityName'] + ", " + data['data']['regionName'] + ", " + data['data']['countryName'])
