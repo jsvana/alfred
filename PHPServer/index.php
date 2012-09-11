@@ -640,15 +640,18 @@
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
-				$result = mysql_query("SELECT `tasks`.* FROM `tasks`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' `tasks`.`user_id`=`sessions`.`user_id`;");
+				//echo "SELECT `tasks`.* FROM `tasks`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' `tasks`.`user_id`=`sessions`.`user_id`;";
+				$result = mysql_query("SELECT `tasks`.* FROM `tasks`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' AND `tasks`.`user_id`=`sessions`.`user_id`;");
 
 				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"tasks\":[";
 
 				while($row = mysql_fetch_assoc($result)) {
-					$ret .= "{\"id\":" . $row['id'] . ",\"task\":\"" . $row['task'] . "\",\"complete\":\"" . $row['complete'] . "\"}";
+					$ret .= "{\"id\":" . $row['id'] . ",\"task\":\"" . $row['task'] . "\",\"complete\":\"" . $row['complete'] . "\"},";
 				}
 
-				$ret .= "]}";
+				$ret = substr($ret, 0, -1);
+
+				$ret .= "]}}";
 			}
 			break;
 		case "Tasks.Add":
@@ -657,8 +660,19 @@
 			} else if(($message = validate_parameters($params, array("task"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				mysql_query("INSERT INTO tasks (task, complete, user_id) VALUES ('" . mysql_real_escape_string($params->task) . "', 'f', (SELECT user_id FROM sessions WHERE api_key='" . mysql_real_escape_string($data->key) . "' LIMIT 1));");
-				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"message\":\"Added task.\"}}";
+				mysql_query("INSERT INTO `task`s (`task`, `complete`, `user_id`) VALUES ('" . mysql_real_escape_string($params->task) . "', 'f', (SELECT `user_id` FROM `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->key) . "' LIMIT 1));");
+				$ret = alfred_result(0, array("message", "Added task."));
+			}
+			break;
+		case "Tasks.Delete":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("id"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				mysql_query("DELETE FROM `tasks` WHERE `id`=" . mysql_real_escape_string($params->id) . " AND `user_id`=(SELECT `user_id` FROM `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->key) . "' LIMIT 1);");
+
+				$ret = alfred_result(0, array("message" => "Task removed."));
 			}
 			break;
 
