@@ -42,6 +42,7 @@ class Alfred(cmd.Cmd, object):
 		data = json.dumps({'alfred': self.api, 'key': self.key, 'method': method, 'params': params}).encode('utf-8')
 		if self.debug: print(data)
 		# TODO: Make the urllib stuff safer
+		#try:
 		req = urllib.request.Request(self.url, data)
 		req_data = urllib.request.urlopen(req).read().decode('utf-8')
 		if self.debug: print("Response: " + req_data)
@@ -55,6 +56,9 @@ class Alfred(cmd.Cmd, object):
 					print(req_data['message'])
 			return (code, req_data)
 		return (-255, req_data)
+		#except:
+			#print("Error retrieving data.")
+			#return (-255, None)
 
 	def do_quit(self, s):
 		return True
@@ -241,6 +245,27 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown password command.")
 		else:
 			print("Unknown password command.")
+	
+	def complete_tools(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['cc'])
+	
+	def help_tools(self):
+		print("tools cc <network>")
+	
+	def do_tools(self, s):
+		args = shlex.split(s)
+		if  len(args) > 0:
+			if args[0] == "cc":
+				if len(args) > 1:
+					(code, data) = self.request('Tools.CreditCard', {'network': args[1]})
+					if code >= 0:
+						print(data['data']['cards'])
+				else:
+					print("Please specify a network.")
+			else:
+				print("Unknown tools command.")
+		else:
+			print("Please specify a command.")
 
 	def complete_tasks(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['list', 'add'])
@@ -255,12 +280,18 @@ class Alfred(cmd.Cmd, object):
 			if args[0] == "list":
 				(code, data) = self.request('Tasks.List')
 				if code >= 0:
-					print('\n'.join(map(lambda t: t['task'], data['data']['tasks'])))
+					print('\n'.join(map(lambda t: "#" + str(t['id']) + ": " + t['task'], data['data']['tasks'])))
 			elif args[0] == "add":
 				if len(args) < 2:
 					print("Please provide a task to add.")
 					return
 				(code, data) = self.request('Tasks.Add', {'task': " ".join(args[1:])})
+				if code >= 0: print(data['data']['message'])
+			elif args[0] == "rm":
+				if len(args) < 2:
+					print("Please provide a task to remove.")
+					return
+				(code, data) = self.request('Tasks.Delete', {'id': args[1]})
 				if code >= 0: print(data['data']['message'])
 			else:
 				print("Unknown tasks command.")
