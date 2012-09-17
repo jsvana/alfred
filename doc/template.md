@@ -19,10 +19,10 @@ Commands are sent in JSON to Alfred in the following format:
 		}
 	}
 
-`alfred` is the API version,  
-`key` is the API key for the session,  
-`method` is the method you would like to run, and  
-`params` contains any parameters you need to send to the method.
+- `alfred` is the API version,
+- `key` is the API key for the session,
+- `method` is the method you would like to run, and
+- `params` contains any parameters you need to send to the method.
 
 To initiate a session, you send
 
@@ -40,7 +40,6 @@ and the server will send you back a reply in the form
 
 	{
 		"code": 0,
-		"message": "Method success.",
 		"data": {
 			"key": "fc2baa1a20b4d5190b122b383d7449fd"
 		}
@@ -50,7 +49,6 @@ if you successfully logged in, or in the form
 
 	{
 		"code": -5,
-		"message": "Method failed.",
 		"data": {
 			"message": "Incorrect username or password."
 		}
@@ -64,7 +62,6 @@ Responses take the form
 
 	{
 		"code": -1,
-		"message": "Malformed command.",
 		"data": { }
 	}
 
@@ -72,16 +69,16 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 ### Results
 
-`0` - `Method success`: the method executed successfully
+- `0` - `Method success`: the method executed successfully
 
 ### Errors
 
-`-1` - `Malformed command`: the command JSON was not formatted correctly  
-`-2` - `Unknown command`: the user specified an unknown method  
-`-3` - `Not authenticated`: the user has not yet authenticated  
-`-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
-`-5` - `Method failed`: the method did not execute successfully  
-`-6` - `Internal server error`: something went wrong inside of Alfred  
+- `-1` - `Malformed command`: the command JSON was not formatted correctly
+- `-2` - `Unknown command`: the user specified an unknown method
+- `-3` - `Not authenticated`: the user has not yet authenticated
+- `-4` - `Incorrect parameters`: parameter(s) are invalid or missing
+- `-5` - `Method failed`: the method did not execute successfully
+- `-6` - `Internal server error`: something went wrong inside of Alfred
 
 ## Commands
 

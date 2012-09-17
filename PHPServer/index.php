@@ -362,7 +362,7 @@
 
 				$subject = preg_replace("|<br />|", "", $subject);
 				preg_match_all("|\s*<h4>(.*?)</h4>\s*<p>(.*?)</p>|", $subject, $matches, PREG_PATTERN_ORDER);
-				
+
 				if($matches) {
 					$breakfast = "\"breakfast\":\"" . $matches[2][0] . "\"";
 					$lunch = "\"lunch\":\"" . $matches[2][1] . "\"";
@@ -710,7 +710,7 @@
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
 				mysql_query("INSERT INTO `task`s (`task`, `complete`, `user_id`) VALUES ('" . mysql_real_escape_string($params->task) . "', 'f', (SELECT `user_id` FROM `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->key) . "' LIMIT 1));");
-				$ret = alfred_result(0, array("message", "Added task."));
+				$ret = alfred_result(0, array("message", "Task added."));
 			}
 			break;
 		case "Tasks.Delete":

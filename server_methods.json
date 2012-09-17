@@ -12,7 +12,7 @@
 						"type" : "string"
 					},
 					{
-						"name" : "password", 
+						"name" : "password",
 						"description" : "the password for the user",
 						"type" : "string"
 					}
@@ -43,11 +43,79 @@
 		"namespace" : "Location",
 		"methods" : [
 			{
+				"method" : "Location.CheckIn",
+				"description" : "[NOT YET IMPLEMENTED] Checks in a user at a given latitude and longitude",
+				"parameters" : [
+					{
+						"name" : "latitude",
+						"description" : "the latitude of the checkin",
+						"type" : "string"
+					},
+					{
+						"name" : "longitude",
+						"description" : "the longitude of the checkin",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "message",
+						"description" : "the error string",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "Location.Directions",
+				"description" : "Gets directions from one place to another.",
+				"parameters" : [
+					{
+						"name" : "from",
+						"description" : "the origin",
+						"type" : "string"
+					},
+					{
+						"name" : "to",
+						"description" : "the destination",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "directions",
+						"description" : "the array of steps in the route",
+						"type" : "json"
+					}
+				]
+			},
+			{
+				"method" : "Location.LatLng",
+				"description" : "Gets the nearest zip code from the given latitude and longitude.",
+				"parameters" : [
+					{
+						"name" : "latitude",
+						"description" : "the latitude of the position",
+						"type" : "string"
+					},
+					{
+						"name" : "longitude",
+						"description" : "the longitude of the position",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "zip",
+						"description" : "the nearest zip code",
+						"type" : "string"
+					}
+				]
+			},
+			{
 				"method" : "Location.IPLookup",
 				"description" : "Gets the physical location of an IP address.",
 				"parameters" : [
 					{
-
 						"name" : "ip",
 						"description" : "the IP address to look up",
 						"type" : "string"
@@ -263,6 +331,55 @@
 		]
 	},
 	{
+		"namespace" : "MTU",
+		"methods" : [
+			{
+				"method" : "MTU.Dining",
+				"description" : "Fetches the daily dining menu at Michigan Tech",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "breakfast",
+						"description" : "the breakfast menu",
+						"type" : "string"
+					},
+					{
+						"name" : "lunch",
+						"description" : "the lunch menu",
+						"type" : "string"
+					},
+					{
+						"name" : "dinner",
+						"description" : "the dinner menu",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"method" : "MTU.WMTU",
+				"description" : "Fetches the currently playing song information on WMTU",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "song",
+						"description" : "the song name",
+						"type" : "string"
+					},
+					{
+						"name" : "artist",
+						"description" : "the artist name",
+						"type" : "string"
+					},
+					{
+						"name" : "album",
+						"description" : "the album name",
+						"type" : "string"
+					}
+				]
+			}
+		]
+	},
+	{
 		"namespace" : "Net",
 		"methods" : [
 			{
@@ -386,29 +503,6 @@
 						"name" : "description",
 						"description" : "the latest status description",
 						"type" : "string"
-					}
-				]
-			}
-		]
-	},
-	{
-		"namespace" : "Net.FatSecret",
-		"methods" : [
-			{
-				"method" : "Net.FatSecret.Food",
-				"description" : "Searches FatSecret for a given food.",
-				"parameters" : [
-					{
-						"name" : "food",
-						"description" : "the search string",
-						"type" : "string"
-					}
-				],
-				"returns" : [
-					{
-						"name" : "foods",
-						"description" : "the returned results",
-						"type" : "json"
 					}
 				]
 			}
@@ -613,6 +707,59 @@
 					{
 						"name" : "password",
 						"description" : "the retrieved password",
+						"type" : "string"
+					}
+				]
+			}
+		]
+	},
+	{
+		"namespace" : "Tasks",
+		"methods" : [
+			{
+				"name" : "Tasks.List",
+				"description" : "Lists all tasks for the user",
+				"parameters" : [ ],
+				"returns" : [
+					{
+						"name" : "tasks",
+						"description" : "the array of tasks",
+						"type" : "json"
+					}
+				]
+			},
+			{
+				"name" : "Tasks.Add",
+				"description" : "Adds a task to the user's task list",
+				"parameters" : [
+					{
+						"name" : "task",
+						"description" : "the task to be added",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "message",
+						"description" : "the status of the addition",
+						"type" : "string"
+					}
+				]
+			},
+			{
+				"name" : "Tasks.Delete",
+				"description" : "Deletes a task from the user's task list",
+				"parameters" : [
+					{
+						"name" : "id",
+						"description" : "the ID of the task to be deleted",
+						"type" : "string"
+					}
+				],
+				"returns" : [
+					{
+						"name" : "message",
+						"description" : "the status of the deletion",
 						"type" : "string"
 					}
 				]
