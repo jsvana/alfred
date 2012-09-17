@@ -19,9 +19,9 @@ Commands are sent in JSON to Alfred in the following format:
 		}
 	}
 
-`alfred` is the API version,  
-`key` is the API key for the session,  
-`method` is the method you would like to run, and  
+`alfred` is the API version,
+`key` is the API key for the session,
+`method` is the method you would like to run, and
 `params` contains any parameters you need to send to the method.
 
 To initiate a session, you send
@@ -40,7 +40,6 @@ and the server will send you back a reply in the form
 
 	{
 		"code": 0,
-		"message": "Method success.",
 		"data": {
 			"key": "fc2baa1a20b4d5190b122b383d7449fd"
 		}
@@ -50,7 +49,6 @@ if you successfully logged in, or in the form
 
 	{
 		"code": -5,
-		"message": "Method failed.",
 		"data": {
 			"message": "Incorrect username or password."
 		}
@@ -76,12 +74,12 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 ### Errors
 
-`-1` - `Malformed command`: the command JSON was not formatted correctly  
-`-2` - `Unknown command`: the user specified an unknown method  
-`-3` - `Not authenticated`: the user has not yet authenticated  
-`-4` - `Incorrect parameters`: parameter(s) are invalid or missing  
-`-5` - `Method failed`: the method did not execute successfully  
-`-6` - `Internal server error`: something went wrong inside of Alfred  
+`-1` - `Malformed command`: the command JSON was not formatted correctly
+`-2` - `Unknown command`: the user specified an unknown method
+`-3` - `Not authenticated`: the user has not yet authenticated
+`-4` - `Incorrect parameters`: parameter(s) are invalid or missing
+`-5` - `Method failed`: the method did not execute successfully
+`-6` - `Internal server error`: something went wrong inside of Alfred
 
 ## Commands
 
@@ -91,12 +89,12 @@ If the code is less than zero, the response is an error.  Otherwise, the respons
 
 Initiates session with the server.
 
-*Parameters:*  
-`username (string)`, the username for the user  
-`password (string)`, the password for the user  
+*Parameters:*
+`username (string)`, the username for the user
+`password (string)`, the password for the user
 
-*Returns:*  
-`key (string)`, the API key for the user  
+*Returns:*
+`key (string)`, the API key for the user
 
 **Alfred**.***Time***
 
@@ -104,8 +102,8 @@ Gets the server time.
 
 *Parameters:* `none`
 
-*Returns:*  
-`time (string)`, Alfred's system time, in the format YYYY-mm-dd hh:mm:ss GMT-hh:mm  
+*Returns:*
+`time (string)`, Alfred's system time, in the format YYYY-mm-dd hh:mm:ss GMT-hh:mm
 
 ### Location
 
@@ -113,71 +111,71 @@ Gets the server time.
 
 Gets the physical location of an IP address.
 
-*Parameters:*  
-`ip (string)`, the IP address to look up  
+*Parameters:*
+`ip (string)`, the IP address to look up
 
-*Returns:*  
-`ipAddress (string)`, the IP address queried  
-`countryCode (string)`, the short country name  
-`countryName (string)`, the country containing the IP address  
-`regionName (string)`, the region (usually the state) containing the IP address  
-`cityName (string)`, the city containing the IP address  
-`zipCode (string)`, the zip code containing the IP address  
+*Returns:*
+`ipAddress (string)`, the IP address queried
+`countryCode (string)`, the short country name
+`countryName (string)`, the country containing the IP address
+`regionName (string)`, the region (usually the state) containing the IP address
+`cityName (string)`, the city containing the IP address
+`zipCode (string)`, the zip code containing the IP address
 
 **Location**.***Weather***
 
 Fetches current weather for a given zip code.
 
-*Parameters:*  
-`zip (string)`, the zip code for the area  
+*Parameters:*
+`zip (string)`, the zip code for the area
 
-*Returns:*  
-`location (string)`, the city and state for the conditions  
-`text (string)`, a description of the conditions  
-`temp (string)`, the current temperature (in Celcius)  
-`date (string)`, the date of the conditions  
+*Returns:*
+`location (string)`, the city and state for the conditions
+`text (string)`, a description of the conditions
+`temp (string)`, the current temperature (in Celcius)
+`date (string)`, the date of the conditions
 
 **Location**.***Currency***
 
 Converts currency amounts.
 
-*Parameters:*  
-`amount (string)`, the amount to be converted  
-`from (string)`, the original currency  
-`to (string)`, the new currency  
+*Parameters:*
+`amount (string)`, the amount to be converted
+`from (string)`, the original currency
+`to (string)`, the new currency
 
-*Returns:*  
-`amount (number)`, the new amount  
+*Returns:*
+`amount (number)`, the new amount
 
 **Location**.***Zip***
 
 Fetches Zip Code of the given city.
 
-*Parameters:*  
-`city (string)`, the name of the city in the zip code  
+*Parameters:*
+`city (string)`, the name of the city in the zip code
 
-*Returns:*  
-`zip (string)`, the zip code of the city  
+*Returns:*
+`zip (string)`, the zip code of the city
 
 **Location**.***AreaCode***
 
 Fetches the area code of the given city.
 
-*Parameters:*  
-`city (string)`, the name of the city in the area code  
+*Parameters:*
+`city (string)`, the name of the city in the area code
 
-*Returns:*  
-`areacode (string)`, the area code of the city  
+*Returns:*
+`areacode (string)`, the area code of the city
 
 **Location**.***NearestAirport***
 
 Fetches the closest airport to the given city.
 
-*Parameters:*  
-`city (string)`, the name of the city to query  
+*Parameters:*
+`city (string)`, the name of the city to query
 
-*Returns:*  
-`airport (string)`, the closest airport to the city  
+*Returns:*
+`airport (string)`, the closest airport to the city
 
 ### Minecraft
 
@@ -185,31 +183,31 @@ Fetches the closest airport to the given city.
 
 Gets the MOTD of the given server.
 
-*Parameters:*  
-`server (string)`, the Minecraft server to access  
+*Parameters:*
+`server (string)`, the Minecraft server to access
 
-*Returns:*  
-`motd (string)`, the message of the day of the Minecraft server  
+*Returns:*
+`motd (string)`, the message of the day of the Minecraft server
 
 **Minecraft**.***Players***
 
 Gets the current player count of the given server.
 
-*Parameters:*  
-`server (string)`, the Minecraft server to access  
+*Parameters:*
+`server (string)`, the Minecraft server to access
 
-*Returns:*  
-`players (string)`, the number of players on the Minecraft server  
+*Returns:*
+`players (string)`, the number of players on the Minecraft server
 
 **Minecraft**.***MaxPlayers***
 
 Gets the max player count of the given server.
 
-*Parameters:*  
-`server (string)`, the Minecraft server to access  
+*Parameters:*
+`server (string)`, the Minecraft server to access
 
-*Returns:*  
-`maxPlayers (string)`, the maximum number of players allowed on the Minecraft server  
+*Returns:*
+`maxPlayers (string)`, the maximum number of players allowed on the Minecraft server
 
 ### Net
 
@@ -219,48 +217,48 @@ Returns the connecting client's IP address
 
 *Parameters:* `none`
 
-*Returns:*  
-`ip (string)`, the client's IP address  
+*Returns:*
+`ip (string)`, the client's IP address
 
 **Net**.***Ping***
 
 Pings a host from the server.
 
-*Parameters:*  
-`host (string)`, the host to ping  
+*Parameters:*
+`host (string)`, the host to ping
 
-*Returns:*  
-`response (string)`, the ping response from the host  
+*Returns:*
+`response (string)`, the ping response from the host
 
 **Net**.***DNS***
 
 Looks up a host from the server.
 
-*Parameters:*  
-`host (string)`, the host to lookup  
+*Parameters:*
+`host (string)`, the host to lookup
 
-*Returns:*  
-`response (string)`, the DNS lookup results for the host  
+*Returns:*
+`response (string)`, the DNS lookup results for the host
 
 **Net**.***Shorten***
 
 Shortens a given URL.
 
-*Parameters:*  
-`url (string)`, the URL to shorten  
+*Parameters:*
+`url (string)`, the URL to shorten
 
-*Returns:*  
-`url (string)`, the shortened URL  
+*Returns:*
+`url (string)`, the shortened URL
 
 **Net**.***LMGTFY***
 
 Gives an LMGTFY URL from the given string.
 
-*Parameters:*  
-`text (string)`, the text to be included in the URL  
+*Parameters:*
+`text (string)`, the text to be included in the URL
 
-*Returns:*  
-`url (string)`, the query URL  
+*Returns:*
+`url (string)`, the query URL
 
 ### Net.Bitbucket
 
@@ -268,11 +266,11 @@ Gives an LMGTFY URL from the given string.
 
 Gets the followers of the given Bitbucket user.
 
-*Parameters:*  
-`user (string)`, the user to search  
+*Parameters:*
+`user (string)`, the user to search
 
-*Returns:*  
-`followers (json)`, a JSON array of the followers  
+*Returns:*
+`followers (json)`, a JSON array of the followers
 
 **Net.Bitbucket**.***Status***
 
@@ -280,9 +278,9 @@ Gets Bitbucket's status.
 
 *Parameters:* `none`
 
-*Returns:*  
-`time (string)`, the time of the latest update  
-`description (string)`, the latest status description  
+*Returns:*
+`time (string)`, the time of the latest update
+`description (string)`, the latest status description
 
 ### Net.FatSecret
 
@@ -290,11 +288,11 @@ Gets Bitbucket's status.
 
 Searches FatSecret for a given food.
 
-*Parameters:*  
-`food (string)`, the search string  
+*Parameters:*
+`food (string)`, the search string
 
-*Returns:*  
-`foods (json)`, the returned results  
+*Returns:*
+`foods (json)`, the returned results
 
 ### Net.Github
 
@@ -304,9 +302,9 @@ Gets Github's status.
 
 *Parameters:* `none`
 
-*Returns:*  
-`time (string)`, the time of the latest update  
-`description (string)`, the latest status description  
+*Returns:*
+`time (string)`, the time of the latest update
+`description (string)`, the latest status description
 
 ### Net.TMDB
 
@@ -314,12 +312,12 @@ Gets Github's status.
 
 Finds first movie resulting from given title
 
-*Parameters:*  
-`title (string)`, the query title  
+*Parameters:*
+`title (string)`, the query title
 
-*Returns:*  
-`total_results (number)`, the number of returned results  
-`first_result (json)`, the first returned result  
+*Returns:*
+`total_results (number)`, the number of returned results
+`first_result (json)`, the first returned result
 
 ### Net.Twitter
 
@@ -329,48 +327,48 @@ Initiates OAuth Twitter authorization.
 
 *Parameters:* `none`
 
-*Returns:*  
-`url (string)`, the URL to which the user must navigate to complete authorization  
+*Returns:*
+`url (string)`, the URL to which the user must navigate to complete authorization
 
 **Net.Twitter**.***CompleteAuth***
 
 Completes OAuth Twitter authorization.
 
-*Parameters:*  
-`verifier (string)`, the code displayed on the Net.Twitter.StartAuth URL  
+*Parameters:*
+`verifier (string)`, the code displayed on the Net.Twitter.StartAuth URL
 
-*Returns:*  
-`message (string)`, the status of the completed authorization  
+*Returns:*
+`message (string)`, the status of the completed authorization
 
 **Net.Twitter**.***Tweet***
 
 Sets a new Twitter status (tweet)
 
-*Parameters:*  
-`tweet (string)`, the new status  
+*Parameters:*
+`tweet (string)`, the new status
 
-*Returns:*  
-`message (string)`, the status of the tweet  
+*Returns:*
+`message (string)`, the status of the tweet
 
 **Net.Twitter**.***Tweets***
 
 Gets the most recent tweets of the given user.
 
-*Parameters:*  
-`user (string)`, the user whose tweets are fetched  
+*Parameters:*
+`user (string)`, the user whose tweets are fetched
 
-*Returns:*  
-`tweets (json)`, the user's most recent tweets  
+*Returns:*
+`tweets (json)`, the user's most recent tweets
 
 **Net.Twitter**.***LastTweet***
 
 Gets the most recent tweet of the given user.
 
-*Parameters:*  
-`user (string)`, the user whose tweet is fetched  
+*Parameters:*
+`user (string)`, the user whose tweet is fetched
 
-*Returns:*  
-`tweet (string)`, the user's most recent tweet  
+*Returns:*
+`tweet (string)`, the user's most recent tweet
 
 ### Password
 
@@ -378,26 +376,26 @@ Gets the most recent tweet of the given user.
 
 Adds a password to the password manager.
 
-*Parameters:*  
-`site (string)`, the site for which the password is retrieved  
-`user (string)`, the user of the password  
-`new (string)`, the new password that is added  
-`master (string)`, the encryption key and identity verification  
+*Parameters:*
+`site (string)`, the site for which the password is retrieved
+`user (string)`, the user of the password
+`new (string)`, the new password that is added
+`master (string)`, the encryption key and identity verification
 
-*Returns:*  
-`message (string)`, the status of the password insertion  
+*Returns:*
+`message (string)`, the status of the password insertion
 
 **Password**.***Retrieve***
 
 Retrieves a password from the password manager.
 
-*Parameters:*  
-`site (string)`, the site for which the password is retrieved  
-`user (string)`, the user of the password  
-`master (string)`, the encryption key and identity verification  
+*Parameters:*
+`site (string)`, the site for which the password is retrieved
+`user (string)`, the user of the password
+`master (string)`, the encryption key and identity verification
 
-*Returns:*  
-`password (string)`, the retrieved password  
+*Returns:*
+`password (string)`, the retrieved password
 
 ### XBMC
 
@@ -407,8 +405,8 @@ Pauses current stream.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Next***
 
@@ -416,8 +414,8 @@ Skips to next song in queue.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Previous***
 
@@ -425,8 +423,8 @@ Skips to previous song in queue.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Shuffle***
 
@@ -434,8 +432,8 @@ Shuffles Now Playing queue.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Mute***
 
@@ -443,8 +441,8 @@ Mutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Unmute***
 
@@ -452,8 +450,8 @@ Unmutes XBMC.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Up***
 
@@ -461,8 +459,8 @@ Moves XBMC selection up.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Down***
 
@@ -470,8 +468,8 @@ Moves XBMC selection down.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Left***
 
@@ -479,8 +477,8 @@ Moves XBMC selection left.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Right***
 
@@ -488,8 +486,8 @@ Moves XBMC selection right.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Select***
 
@@ -497,16 +495,16 @@ Makes XBMC selection.
 
 *Parameters:* `none`
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
 **XBMC**.***Volume***
 
 Sets XBMC volume.
 
-*Parameters:*  
-`volume (string)`, the player's new volume  
+*Parameters:*
+`volume (string)`, the player's new volume
 
-*Returns:*  
-`message (string)`, the result of the command.  
+*Returns:*
+`message (string)`, the result of the command.
 
