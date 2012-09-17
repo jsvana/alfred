@@ -62,7 +62,6 @@ Responses take the form
 
 	{
 		"code": -1,
-		"message": "Malformed command.",
 		"data": { }
 	}
 
