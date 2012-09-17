@@ -167,6 +167,24 @@
 				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . json_encode(json_decode($json)) . "}";
 			}
 			break;
+		case "Location.LatLng":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("lat", "lng"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$lat = $params->lat;
+				$lng = $params->lng;
+
+				$url = "http://where.yahooapis.com/geocode?appid=" . $YAHOO_APPID . "&gflags=R&flags=J&q=" . url_encode($lat) . ",+" . url_encode($lng);
+				$data = file_get_contents($url);
+				$json = json_decode($data);
+
+				$result = $json->ResultSet->Results[0];
+
+				$ret = alfred_result(0, array("zip" => $result->uzip));
+			}
+			break;
 		case "Location.Weather":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
@@ -331,6 +349,49 @@
 			}
 			break;
 
+		/* MTU */
+		case "MTU.Dining":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$url = "http://www.aux.mtu.edu/dining_local/rss/";
+
+				$xml = simplexml_load_file($url);
+
+				$subject = (string)$xml->channel->item[1]->description;
+
+				$subject = preg_replace("|<br />|", "", $subject);
+				preg_match_all("|\s*<h4>(.*?)</h4>\s*<p>(.*?)</p>|", $subject, $matches, PREG_PATTERN_ORDER);
+				
+				if($matches) {
+					$breakfast = "\"breakfast\":\"" . $matches[2][0] . "\"";
+					$lunch = "\"lunch\":\"" . $matches[2][1] . "\"";
+					$dinner = "\"dinner\":\"" . $matches[2][2] . "\"";
+					$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{" . $breakfast . "," . $lunch . "," . $dinner . "}}";
+				} else {
+					$ret = alfred_result(-5, array("message" => "Something went wrong while fetching the menu."));
+				}
+			}
+			break;
+		case "MTU.WMTU":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$url = "http://wmtu.mtu.edu/wp-content/wmtu-custom/rssTrackBack.php";
+
+				$xml = simplexml_load_file($url);
+
+				$playing = $xml->channel->item[0];
+
+				$date = $playing->pubDate;
+				$song = str_replace("Song: ", "", $playing->song);
+				$artist = str_replace("Artist: ", "", $playing->artist);
+				$album = str_replace("Album: ", "", $playing->album);
+
+				$ret = "{\"code\":0,\"message\":\"Method success\",\"data\":{\"date\":\"" . $date . "\",\"song\":\"" . $song . "\",\"artist\":\"" . $artist . "\",\"album\":\"" . $album . "\"}}";
+			}
+			break;
+
 		/* Net.Bitbucket */
 		case "Net.Bitbucket.Followers":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
@@ -491,7 +552,7 @@
 			} else if(($message = validate_parameters($params, array("text"))) !== "") {
 				$ret = alfred_error(-4, array("message" => $message));
 			} else {
-				$ret = alfred_result(0, array("url" => "http://lmgtfy.com/?=" . url_encode($params->text)));
+				$ret = alfred_result(0, array("url" => "http://lmgtfy.com/?q=" . url_encode($params->text)));
 			}
 			break;
 
@@ -673,6 +734,28 @@
 				mysql_query("DELETE FROM `tasks` WHERE `id`=" . mysql_real_escape_string($params->id) . " AND `user_id`=(SELECT `user_id` FROM `sessions` WHERE `api_key`='" . mysql_real_escape_string($data->key) . "' LIMIT 1);");
 
 				$ret = alfred_result(0, array("message" => "Task removed."));
+			}
+			break;
+
+		/* Tools */
+		case "Tools.CreditCard":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			}  else if(($message = validate_parameters($params, array("network"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$ch = curl_init();
+
+				curl_setopt($ch, CURLOPT_URL, "http://www.getcreditcardnumbers.com/generated-credit-card-numbers");
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_HEADER, true);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, "network=" . $params->network . "&data_format=JSON&no_entries=1");
+
+				$numbers = curl_exec($ch);
+
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"cards\":" . $numbers . "}}";
 			}
 			break;
 
