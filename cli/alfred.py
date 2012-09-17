@@ -15,7 +15,7 @@ class Alfred(cmd.Cmd, object):
 	intro = "Hello, Sir. How may I help?"
 	doc_header = "What may I help you with today, Sir?"
 
-	debug = False
+	debug = True
 	#misc_header = ""
 	#undoc_header = ""
 	ruler = ""
