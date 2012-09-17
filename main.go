@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"unicode/utf8"
-	"strings"
 	"regexp"
+	"strings"
+	"unicode/utf8"
 )
+
+type Result []Token
 
 const (
 	AQL_STR = iota
@@ -14,9 +17,17 @@ const (
 	AQL_ARG
 	AQL_OP
 	AQL_FUNC
-	VAR_DELIMITER = "`"
+	VAR_DELIMITER   = "`"
 	FUNCTION_PARENS = "()"
 )
+
+// The extra `json:` crap is to make sure it gets lower cased
+type Response struct {
+	Alfred string            `json:"alfred"`
+	Key    string            `json:"key"`
+	Method string            `json:"method"`
+	Params map[string]string `json:"params"`
+}
 
 type Token struct {
 	Text string
@@ -24,14 +35,14 @@ type Token struct {
 }
 
 type Param struct {
-	Key string
+	Key   string
 	Value string
 }
 
 type Query struct {
-	Table string
+	Table  string
 	Fields []string
-	Where []Param
+	Where  map[string]string
 }
 
 func lg(str string) {
@@ -41,7 +52,7 @@ func lg(str string) {
 func nextChar(str string) (string, string) {
 	var ret string
 	first, _ := utf8.DecodeRune([]byte(str))
-	if (len(str) > 1) {
+	if len(str) > 1 {
 		ret = str[1:]
 	} else {
 		ret = ""
@@ -49,7 +60,7 @@ func nextChar(str string) (string, string) {
 	return string(first), ret
 }
 
-func peekChar(str string) (string) {
+func peekChar(str string) string {
 	first, _ := utf8.DecodeRune([]byte(str))
 	return string(first)
 }
@@ -57,7 +68,7 @@ func peekChar(str string) (string) {
 func isValidChar(str string) (ret bool) {
 	reg, err := regexp.Compile("[0-9a-zA-Z_]")
 	ret = false
-	if (err != nil) {
+	if err != nil {
 		fmt.Println("Error in regexp.")
 	} else {
 		ret = reg.Match([]byte(str))
@@ -69,7 +80,7 @@ func isValidChar(str string) (ret bool) {
 func isOper(str string) (ret bool) {
 	reg, err := regexp.Compile("[=\\.,;]")
 	ret = false
-	if (err != nil) {
+	if err != nil {
 		fmt.Println("Error in regexp.")
 	} else {
 		ret = reg.Match([]byte(str))
@@ -81,7 +92,7 @@ func isOper(str string) (ret bool) {
 func isSpace(str string) (ret bool) {
 	reg, err := regexp.Compile("\\s")
 	ret = false
-	if (err != nil) {
+	if err != nil {
 		fmt.Println("Error in regexp.")
 	} else {
 		ret = reg.Match([]byte(str))
@@ -90,9 +101,9 @@ func isSpace(str string) (ret bool) {
 	return
 }
 
-func contains(arr []string, val string) (bool) {
+func contains(arr []string, val string) bool {
 	for _, a := range arr {
-		if (a == val) {
+		if a == val {
 			return true
 		}
 	}
@@ -102,7 +113,7 @@ func contains(arr []string, val string) (bool) {
 func niceString(str string) (ret string) {
 	ret = str
 	reg, err := regexp.Compile("[\n\t]")
-	if (err != nil) {
+	if err != nil {
 		fmt.Println("Error in regexp.")
 	} else {
 		ret = string(reg.ReplaceAll([]byte(str), []byte("")))
@@ -111,31 +122,26 @@ func niceString(str string) (ret string) {
 	return
 }
 
-func addToken(tokens []Token, tokText string, tokType int) ([]Token) {
-	var t Token
-	t.Type = tokType
-	t.Text = tokText
-	return append(tokens, t)
+func (r *Result) addToken(tokText string, tokType int) {
+	*r = append(*r, Token{Type: tokType, Text: tokText})
 }
 
-func nextToken(tokens []Token) (Token, []Token) {
-	return tokens[0], tokens[1:]
+func (r *Result) nextToken() Token {
+	ret := (*r)[0]
+	*r = (*r)[1:]
+	return ret
 }
 
-func peekToken(tokens []Token) (Token) {
-	return tokens[0]
+func (r *Result) peekToken() Token {
+	return (*r)[0]
 }
 
-func hasNextToken(tokens []Token) (bool) {
-	return len(tokens) != 0
+func (t *Result) hasNextToken() bool {
+	return len(*t) != 0
 }
 
-func tokenCount(tokens []Token) (int) {
-	return len(tokens)
-}
-
-func tokenTextEq(token Token, text string) (bool) {
-	return token.Text == text || strings.ToLower(token.Text) == text
+func (t *Token) tokenTextEq(text string) bool {
+	return t.Text == text || strings.ToLower(t.Text) == text
 }
 
 func parseAQL(command string, apiKey string) (string, []string) {
@@ -143,65 +149,66 @@ func parseAQL(command string, apiKey string) (string, []string) {
 
 	keywords := []string{"select", "insert", "delete", "from", "where", "and", "or"}
 
-	var methods = map[string] string {
-		"weather": "Location.Weather",
-        "directions": "Location.Directions",
-        "iplookup": "Location.IPLookup",
-        "minecraft_motd": "Minecraft.MOTD",
-        "minecraft_players": "Minecraft.Players",
-        "minecraft_maxplayers": "Minecraft.MaxPlayers",
-        "bitbucket_status": "Net.Bitbucket.Status",
-        "github_status": "Net.Github.Status",
-        "heroku_status": "Net.Heroku.Status",
-        "movie": "Net.TMDB.Movie",
-        "ping": "Net.Ping",
-        "dns": "Net.DNS",
-        "shorten": "Net.Shorten",
-        "lmgtfy": "Net.LMGTFY",
-        "tasks": "Tasks.List",
+	var methods = map[string]string{
+		"weather":              "Location.Weather",
+		"directions":           "Location.Directions",
+		"iplookup":             "Location.IPLookup",
+		"minecraft_motd":       "Minecraft.MOTD",
+		"minecraft_players":    "Minecraft.Players",
+		"minecraft_maxplayers": "Minecraft.MaxPlayers",
+		"bitbucket_status":     "Net.Bitbucket.Status",
+		"github_status":        "Net.Github.Status",
+		"heroku_status":        "Net.Heroku.Status",
+		"movie":                "Net.TMDB.Movie",
+		"ping":                 "Net.Ping",
+		"dns":                  "Net.DNS",
+		"shorten":              "Net.Shorten",
+		"lmgtfy":               "Net.LMGTFY",
+		"tasks":                "Tasks.List",
 	}
 
-	var tokens []Token
+	var tokens Result
 	var query Query
+	query.Where = make(map[string]string)
 
-	for (len(input) > 0) {
+	for len(input) > 0 {
 		tokText := ""
 		tokType := AQL_STR
 
-		if (isSpace(peekChar(input))) {
+		if isSpace(peekChar(input)) {
 			_, input = nextChar(input)
-		} else if (isOper(peekChar(input))) {
+		} else if isOper(peekChar(input)) {
 			tokText, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_OP)
-		} else if (peekChar(input) == VAR_DELIMITER) {
+			tokens.addToken(tokText, AQL_OP)
+		} else if peekChar(input) == VAR_DELIMITER {
 			_, input = nextChar(input)
 
-			for (peekChar(input) != VAR_DELIMITER && len(input) > 0) {
+			for peekChar(input) != VAR_DELIMITER && len(input) > 0 {
 				var n string
 				n, input = nextChar(input)
 				tokText += n
 			}
 
 			_, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_FIELD)
-		} else if (peekChar(input) == "'") {
+			tokens.addToken(tokText, AQL_FIELD)
+		} else if peekChar(input) == "'" {
 			_, input = nextChar(input)
 
-			for (peekChar(input) != "'" && len(input) > 0) {
+			for peekChar(input) != "'" && len(input) > 0 {
 				var n string
 				n, input = nextChar(input)
 				tokText += n
 			}
 
 			_, input = nextChar(input)
-			tokens = addToken(tokens, tokText, AQL_ARG)
+			tokens.addToken(tokText, AQL_ARG)
 		} else {
-			for (len(input) > 0 && isValidChar(peekChar(input))) {
+			for len(input) > 0 && isValidChar(peekChar(input)) {
 				var n string
 				n, input = nextChar(input)
 				tokText += n
 
-				if (input[0:2] == "()") {
+				if input[0:2] == "()" {
 					tokType = AQL_FUNC
 					_, input = nextChar(input)
 					_, input = nextChar(input)
@@ -209,91 +216,83 @@ func parseAQL(command string, apiKey string) (string, []string) {
 				}
 			}
 
-			if (contains(keywords, tokText) || contains(keywords, strings.ToLower(tokText))) {
-				tokens = addToken(tokens, tokText, AQL_KEYWD)
+			if contains(keywords, tokText) || contains(keywords, strings.ToLower(tokText)) {
+				tokens.addToken(tokText, AQL_KEYWD)
 			} else {
-				tokens = addToken(tokens, tokText, tokType)
+				tokens.addToken(tokText, tokType)
 			}
 		}
 	}
 
-	for (hasNextToken(tokens)) {
-		var token Token
-		token, tokens = nextToken(tokens)
+	for tokens.hasNextToken() {
+		token := tokens.nextToken()
 
-		if (token.Type == AQL_KEYWD && tokenTextEq(token, "select")) {
-			for hasNextToken(tokens) {
+		if token.Type == AQL_KEYWD && token.tokenTextEq("select") {
+			for tokens.hasNextToken() {
 				var nToken Token
-				nToken, tokens = nextToken(tokens)
+				nToken = tokens.nextToken()
 				query.Fields = append(query.Fields, nToken.Text)
-				if (peekToken(tokens).Type != AQL_KEYWD) {
-					_, tokens = nextToken(tokens)
+				if tokens.peekToken().Type != AQL_KEYWD {
+					tokens.nextToken()
 				} else {
 					break
 				}
 			}
-		} else if (token.Type == AQL_KEYWD && tokenTextEq(token, "from")) {
+		} else if token.Type == AQL_KEYWD && token.tokenTextEq("from") {
 			var nToken Token
-			nToken, tokens = nextToken(tokens)
+			nToken = tokens.nextToken()
 			query.Table = nToken.Text
-		} else if (token.Type == AQL_KEYWD && tokenTextEq(token, "where")) {
-			for hasNextToken(tokens) {
-				peek := peekToken(tokens)
+		} else if token.Type == AQL_KEYWD && token.tokenTextEq("where") {
+			for tokens.hasNextToken() {
+				peek := tokens.peekToken()
 
-				if (peek.Type == AQL_OP && peek.Text == ";") {
-					_, tokens = nextToken(tokens)
+				if peek.Type == AQL_OP && peek.Text == ";" {
+					tokens.nextToken()
 					break
-				} else if (tokenCount(tokens) > 5) {
+				} else if len(tokens) > 5 {
 					var param Token
 					var next Token
-					param, tokens = nextToken(tokens)
-					_, tokens = nextToken(tokens)
-					next, tokens = nextToken(tokens)
+					param = tokens.nextToken()
+					tokens.nextToken()
+					next = tokens.nextToken()
 
-					if (next.Type == AQL_FUNC && next.Text == "me") {
-						_, tokens = nextToken(tokens)
-						_, tokens = nextToken(tokens)
+					if next.Type == AQL_FUNC && next.Text == "me" {
+						tokens.nextToken()
+						tokens.nextToken()
 
-						peek = peekToken(tokens)
+						peek = tokens.peekToken()
 
-						if (peek.Type == AQL_KEYWD && peek.Text == "and") {
-							_, tokens = nextToken(tokens)
-						} else if (peek.Type == AQL_OP && peek.Text == ";") {
-							_, tokens = nextToken(tokens)
+						if peek.Type == AQL_KEYWD && peek.Text == "and" {
+							tokens.nextToken()
+						} else if peek.Type == AQL_OP && peek.Text == ";" {
+							tokens.nextToken()
 							break
 						}
 					} else {
-						var p Param
-						p.Key = param.Text
-						p.Value = next.Text
-						query.Where = append(query.Where, p)
+						query.Where[param.Text] = next.Text
 
-						peek = peekToken(tokens)
+						peek = tokens.peekToken()
 
-						if (peek.Type == AQL_KEYWD && tokenTextEq(peek, "and")) {
-							_, tokens = nextToken(tokens)
-						} else if (peek.Type == AQL_OP && peek.Text == ";") {
-							_, tokens = nextToken(tokens)
+						if peek.Type == AQL_KEYWD && peek.tokenTextEq("and") {
+							tokens.nextToken()
+						} else if peek.Type == AQL_OP && peek.Text == ";" {
+							tokens.nextToken()
 						}
 					}
-				} else if (tokenCount(tokens) > 3) {
+				} else if len(tokens) > 3 {
 					var param Token
 					var next Token
-					var p Param
 
-					param, tokens = nextToken(tokens)
-					_, tokens = nextToken(tokens)
-					next, tokens = nextToken(tokens)
+					param = tokens.nextToken()
+					tokens.nextToken()
+					next = tokens.nextToken()
 
-					p.Key = param.Text
-					p.Value = next.Text
+					query.Where[param.Text] = next.Text
 
-					query.Where = append(query.Where, p)
-
-					if (peek.Type == AQL_KEYWD && tokenTextEq(peek, "and")) {
-						_, tokens = nextToken(tokens)
-					} else if (peek.Type == AQL_OP && peek.Text == ";") {
-						_, tokens = nextToken(tokens)
+					if peek.Type == AQL_KEYWD && peek.tokenTextEq("and") {
+						tokens.nextToken()
+					} else if peek.Type == AQL_OP && peek.Text == ";" {
+						tokens.nextToken()
 						break
 					}
 				} else {
@@ -303,24 +302,18 @@ func parseAQL(command string, apiKey string) (string, []string) {
 		}
 	}
 
-	alfredStr := "{\"alfred\":\"0.1\",\"key\":\"" + apiKey + "\",\"method\":\"" + methods[query.Table] + "\",\"params\":{"
+	alfredStr, _ := json.Marshal(Response{Alfred: "0.1", Key: apiKey, Method: methods[query.Table], Params: query.Where})
 
-	for _, p := range(query.Where) {
-		alfredStr += "\"" + p.Key + "\":\"" + p.Value + "\","
-	}
-
-	alfredStr = alfredStr[0:len(alfredStr) - 1] + "}}"
-
-	return alfredStr, query.Fields
+	return string(alfredStr), query.Fields
 }
 
 func main() {
-	command := "SELECT `location` FROM `weather stuff` WHERE `zip`='48195';"
+	command := "SELECT `location` FROM `weather` WHERE `zip`='48195';"
 	fmt.Println("in:", command)
 	out, returns := parseAQL(command, "")
 	fmt.Println("out:", out)
 	fmt.Println("returns:")
-	for _, f := range(returns) {
+	for _, f := range returns {
 		fmt.Println(f)
 	}
 }

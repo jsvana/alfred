@@ -78,7 +78,7 @@
 				$ret = alfred_error(-3);
 			} else {
 				// fetch rules from mysql
-				//$row = 
+				//$row =
 			}
 			break;
 		case "Fun.MLF.AddRule":
@@ -163,7 +163,7 @@
 
 				$url = "http://api.ipinfodb.com/v3/ip-city/?key=" . $IP_INFO_DB_KEY . "&ip=" . url_encode($ip) . "&format=json";
 				$json = file_get_contents($url);
-				
+
 				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . json_encode(json_decode($json)) . "}";
 			}
 			break;
@@ -210,8 +210,8 @@
 
 				$channel_yweather = $weather->channel->children("http://xml.weather.yahoo.com/ns/rss/1.0");
 
-				foreach($channel_yweather as $x => $channel_item) 
-					foreach($channel_item->attributes() as $k => $attr) 
+				foreach($channel_yweather as $x => $channel_item)
+					foreach($channel_item->attributes() as $k => $attr)
 						$yw_channel[$x][$k] = $attr;
 
 				$item_yweather = $weather->channel->item->children("http://xml.weather.yahoo.com/ns/rss/1.0");
@@ -219,7 +219,7 @@
 				foreach($item_yweather as $x => $yw_item) {
 					foreach($yw_item->attributes() as $k => $attr) {
 						if($k == 'day') $day = $attr;
-						if($x == 'forecast') { $yw_forecast[$x][$day . ''][$k] = $attr;	} 
+						if($x == 'forecast') { $yw_forecast[$x][$day . ''][$k] = $attr;	}
 						else { $yw_forecast[$x][$k] = $attr; }
 					}
 				}
@@ -401,7 +401,7 @@
 			} else {
 				$url = "https://api.bitbucket.org/1.0/users/" . url_encode($params->user) . "/followers/";
 				$json = json_decode(file_get_contents($url));
-				
+
 				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"followers\":" . json_encode($json->followers) . "}}";
 			}
 			break;
@@ -414,18 +414,6 @@
 				$latestItem = $rss->channel->item[0];
 
 				$ret = alfred_result(0, array("time" => "{$latestItem->title}", "description" => "{$latestItem->description}"));
-			}
-			break;
-
-		/* Net.FatSecret */
-		case "Net.FatSecret.Food":
-			if(!session_authenticated($data->key)) {
-				$ret = alfred_error(-3);
-			} else if(($message = validate_parameters($params, array("food"))) !== "") {
-				$ret = alfred_error(-4, array("message" => $message));
-			} else {
-				$json = json_decode(query_fatsecret($FAT_SECRET_KEY, $FAT_SECRET_SECRET_KEY, 'foods.search', array('search_expression' => $params->food)));
-				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"foods\":" . json_encode($json->foods->food) . "}}";
 			}
 			break;
 
@@ -923,7 +911,7 @@
 		switch($code) {
 			default:
 			case 0:
-				$json = json_encode(array("code" => 0, "message" => "Method success.", "data" => $data));
+				$json = json_encode(array("code" => 0, "data" => $data));
 				break;
 		}
 
@@ -936,16 +924,16 @@
 		switch($code) {
 			default:
 			case -1:
-				$json = "{\"code\":-1,\"message\":\"Malformed command.\",\"data\":{}}";
+				$json = "{\"code\":-1,\"data\":{\"message\":\"Malformed command.\"}}";
 				break;
 			case -2:
-				$json = "{\"code\":-2,\"message\":\"Unknown command.\",\"data\":{}}";
+				$json = "{\"code\":-2,\"data\":{\"message\":\"Unknown command.\"}}";
 				break;
 			case -3:
-				$json = "{\"code\":-3,\"message\":\"Not authenticated.\",\"data\":{}}";
+				$json = "{\"code\":-3,\"data\":{\"message\":\"Not authenticated.\"}}";
 				break;
 			case -4:
-				$json = "{\"code\":-4,\"message\":\"Incorrect parameters.\",\"data\":{";
+				$json = "{\"code\":-4,\"data\":{";
 
 				if(isset($data['message'])) {
 					$json .= "\"message\":\"" . $data['message'] . "\"";
@@ -954,7 +942,7 @@
 				$json .= "}}";
 				break;
 			case -5:
-				$json = "{\"code\":-5,\"message\":\"Method failed.\",\"data\":{";
+				$json = "{\"code\":-5,\"data\":{";
 
 				if(isset($data['message'])) {
 					$json .= "\"message\":\"" . $data['message'] . "\"";
@@ -1216,48 +1204,5 @@
 		}
 
 		return $retarr;
-	}
-
-exit(0);
-
-/**
- * Get a request token.
- * @param string $consumer_key obtained when you registered your app
- * @param string $consumer_secret obtained when you registered your app
- * @param string $callback callback url can be the string 'oob'
- * @param bool $usePost use HTTP POST instead of GET
- * @param bool $useHmacSha1Sig use HMAC-SHA1 signature
- * @param bool $passOAuthInHeader pass OAuth credentials in HTTP header
- * @return array of response parameters or empty array on error
- */
-	function query_fatsecret($consumer_key, $consumer_secret, $method, $parameters) {
-		$url = "http://platform.fatsecret.com/rest/server.api";
-		$params['format'] = 'json';
-		$params['method'] = $method;
-		$params['oauth_version'] = '1.0';
-		$params['oauth_nonce'] = mt_rand();
-		$params['oauth_timestamp'] = time();
-		$params['oauth_consumer_key'] = $consumer_key;
-		$params += $parameters;
-
-		$params['oauth_signature_method'] = 'HMAC-SHA1';
-		$params['oauth_signature'] = oauth_compute_hmac_sig('GET', $url, $params, $consumer_secret, null);
-
-		$query_str = "?";
-
-		foreach($params as $key => $value) {
-			$query_str .= $key . "=" . urlencode($value) . "&";
-		}
-
-		$query_str = substr($query_str, 0, -1);
-
-		$request_url = $url . $query_str;
-		$ch = curl_init($request_url);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HEADER, 'Accepts: text/json');
-		$response = curl_exec($ch);
-		curl_close($ch);
-
-		return $response;
 	}
 ?>
