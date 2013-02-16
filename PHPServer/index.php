@@ -369,6 +369,7 @@
 				$xml = simplexml_load_file($url);
 
 				$subject = (string)$xml->channel->item[1]->description;
+				$time = (string)$xml->channel->item[1]->pubDate;
 
 				$subject = preg_replace("|<br />|", "", $subject);
 				preg_match_all("|\s*<h4>(.*?)</h4>\s*<p>(.*?)</p>|", $subject, $matches, PREG_PATTERN_ORDER);
@@ -377,7 +378,7 @@
 					$breakfast = "\"breakfast\":\"" . $matches[2][0] . "\"";
 					$lunch = "\"lunch\":\"" . $matches[2][1] . "\"";
 					$dinner = "\"dinner\":\"" . $matches[2][2] . "\"";
-					$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{" . $breakfast . "," . $lunch . "," . $dinner . "}}";
+					$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":{\"time\":\"" . $time . "\"," . $breakfast . "," . $lunch . "," . $dinner . "}}";
 				} else {
 					$ret = alfred_result(-5, array("message" => "Something went wrong while fetching the menu."));
 				}

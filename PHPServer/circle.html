@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Circle</title>
+		
+		<script>
+			var ctx;
+			var rotation = 45;
+
+			var init = function() {
+				ctx = document.getElementById('c').getContext('2d');
+
+				draw();
+			};
+
+			var draw = function() {
+				ctx.clearRect(0, 0, 400, 400);
+
+				var width = Math.cos(rotation * Math.PI / 180) * 200;
+				var height = Math.sin(rotation * Math.PI / 180) * 200;
+
+				ctx.strokeStyle = '#000000';
+				ctx.strokeRect(width + 200, height + 200, -width, -height);
+
+				rotation -= 5;
+
+				setTimeout("draw()", 1000 / 30);
+			};
+		</script>
+	</head>
+
+	<body onload="init()">
+		<canvas id="c" width="400" height="400"></canvas>
+	</body>
+</html>
