@@ -157,6 +157,20 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Github command.")
 		else:
 			print("Please specify a Github command.")
+	
+	def help_home(self):
+		print("home temp")
+	
+	def do_home(self, s):
+		args = shlex.split(s)
+		if len(args) == 1:
+			if args[0] == "temp":
+				(code, data) = self.request('Home.Temperature')
+				if code >= 0: print("Temperature: " + (.1 * data['data']['temperature'] + 2.3))
+			else:
+				print("Unknown Home command.")
+		else:
+			print("Please specify a Home command.")
 
 	def complete_heroku(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['status'])

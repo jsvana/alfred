@@ -125,6 +125,16 @@
 			}
 			break;
 
+		/* Home */
+		case "Home.Temperature":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$json = file_get_contents("http://pi.jsvana.me:8080/temperatures/mostrecent");
+				$ret = "{\"code\":0,\"message\":\"Method success.\",\"data\":" . $json . "}";
+			}
+			break;
+
 		/* Location */
 		case "Location.CheckIn":
 			if(!session_authenticated($data->key)) {
