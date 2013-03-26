@@ -662,6 +662,18 @@
 			}
 			break;
 
+		/* Net.WordReference */
+		case "Net.WordReference.Translate":
+			if (!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if (($message = validate_parameters($params, array("src_lang", "dest_lang", "term"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$json = file_get_contents("http://api.wordreference.com/0.8/" . $config['WORD_REFERENCE_KEY'] . "/" . $params->src_lang . $params->dest_lang . "/" . $params->term);
+				
+			}
+			break;
+
 		/* Password */
 		case "Password.Retrieve":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
