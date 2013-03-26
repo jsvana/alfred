@@ -493,6 +493,23 @@
 			}
 			break;
 
+		/* Net.OpenCNAM */
+		case "Net.OpenCNAM.CallerID":
+			if (!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if (($message = validate_parameters($params, array("phone"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$phone = $params->phone;
+				$name = file_get_contents("https://api.opencnam.com/v2/phone/" . $phone);
+
+				$name = ucwords(strtolower($name));
+
+
+				$ret = alfred_result(0, array("name" => $name));
+			}
+			break;
+
 		/* Net */
 		case "Net.ClientIP":
 			if(!session_authenticated($data->key)) {
