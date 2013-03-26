@@ -166,7 +166,7 @@ class Alfred(cmd.Cmd, object):
 		if len(args) == 1:
 			if args[0] == "temp":
 				(code, data) = self.request('Home.Temperature')
-				if code >= 0: print("Temperature: " + (.1 * data['data']['temperature'] + 2.3))
+				if code >= 0: print("Temperature: " + str(.1 * data['data']['value'] + 2.3))
 			else:
 				print("Unknown Home command.")
 		else:
@@ -354,6 +354,14 @@ class Alfred(cmd.Cmd, object):
 				print("Unknown Twitter command.")
 		else:
 			print("Please specify a Twitter command.")
+	
+	def help_callerid(self):
+		print('callerid <phone number>')
+	
+	def do_callerid(self, s):
+		(code, data) = self.request('Net.OpenCNAM.CallerID', { 'phone': s })
+		if code >= 0:
+			print('Caller: ' + data['data']['name'])
 	
 	def complete_fatsecret(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['food '])
