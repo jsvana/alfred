@@ -787,6 +787,41 @@
 			}
 			break;
 
+		/* User */
+		case "User.AddNotification":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else if(($message = validate_parameters($params, array("application_id", "user_id", "title", "body"))) !== "") {
+				$ret = alfred_error(-4, array("message" => $message));
+			} else {
+				$sql = "INSERT INTO `notifications` (`application_id`, `user_id`, `title`, `body`) VALUES ('";
+				$sql .= mysql_real_escape_string($params->application_id);
+				$sql .= "', '" . mysql_real_escape_string($params->user_id);
+				$sql .= "', '" . mysql_real_escape_string($params->title);
+				$sql .= "', '" . mysql_real_escape_string($params->body) . "');";
+
+				mysql_query($sql);
+
+				$ret = '{"code":0,"mesage":"Method success.","data":{}}';
+			}
+			break;
+		case "User.GetNotifications":
+			if(!session_authenticated($data->key)) {
+				$ret = alfred_error(-3);
+			} else {
+				$result = mysql_query("SELECT `notifications`.* FROM `notifications`, `sessions` WHERE `sessions`.`api_key`='" . mysql_real_escape_string($data->key) . "' AND `notifications`.`user_id`=`sessions`.`user_id`;");
+
+				$ret = '{"code":0,"message":"Method success.","data":{"notifications":[';
+
+				while($row = mysql_fetch_assoc($result)) {
+					$ret .= '{"id":' . $row['id'] . ',"application_id":' . $row['application_id'] . ',"title":"' . $row['title'] . '","body":"' . $row['body'] . '"},';
+				}
+
+				$ret = substr($ret, 0, -1);
+
+				$ret .= ']}}';
+				break;
+
 		/* System */
 		case "System.Introspect":
 			if(!isset($data->key) || $data->key === "" || !session_authenticated($data->key)) {
