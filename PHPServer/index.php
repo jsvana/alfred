@@ -788,7 +788,7 @@
 			break;
 
 		/* User */
-		case "User.AddNotification":
+		case "User.Notifications.Add":
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else if(($message = validate_parameters($params, array("application_id", "user_id", "title", "body"))) !== "") {
@@ -802,10 +802,10 @@
 
 				mysql_query($sql);
 
-				$ret = '{"code":0,"mesage":"Method success.","data":{}}';
+				$ret = '{"code":0,"message":"Method success.","data":{}}';
 			}
 			break;
-		case "User.GetNotifications":
+		case "User.Notifications.List":
 			if(!session_authenticated($data->key)) {
 				$ret = alfred_error(-3);
 			} else {
@@ -820,7 +820,8 @@
 				$ret = substr($ret, 0, -1);
 
 				$ret .= ']}}';
-				break;
+			}
+			break;
 
 		/* System */
 		case "System.Introspect":
