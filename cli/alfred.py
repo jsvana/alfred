@@ -281,6 +281,30 @@ class Alfred(cmd.Cmd, object):
 		else:
 			print("Please specify a command.")
 
+	def complete_notifications(self, text, line, begidx, endidx):
+		return self.generic_complete(text, ['list', 'add'])
+	
+	def help_notifications(self):
+		print("notifications list")
+		print("notifications add <user_id> <application_id> <title> <body>")
+	
+	def do_notifications(self, s):
+		args = shlex.split(s)
+		if len(args) > 0:
+			if args[0] == "list":
+				(code, data) = self.request('User.Notifications.List')
+				if code >= 0:
+					print('\n'.join(map(lambda t: str(t['title']) + ": " + t['body'], data['data']['notifications'])))
+			elif args[0] == "add":
+				if len(args) < 5:
+					print("Please provide proper arguments.")
+					return
+				(code, data) = self.request('User.Notifications.Add', {'user_id': args[1], 'application_id': args[2], 'title': args[3], 'body': args[4]})
+			else:
+				print("Unknown notifications command.")
+		else:
+			print("Please specify a notifications command.")
+
 	def complete_tasks(self, text, line, begidx, endidx):
 		return self.generic_complete(text, ['list', 'add'])
 	
